@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_jenkins',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -54,10 +55,15 @@ MIDDLEWARE = [
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_pep8',
     'django_jenkins.tasks.run_pyflakes',
-    #'django_jenkins.tasks.run_jslint', depreciated
-    #'django_jenkins.tasks.run_csslint',
-    #'django_jenkins.tasks.run_sloccount'
+    # 'django_jenkins.tasks.run_jslint', depreciated
+    # 'django_jenkins.tasks.run_csslint',
+    # 'django_jenkins.tasks.run_sloccount'
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 ROOT_URLCONF = 'coop_fitness_back.urls'
 

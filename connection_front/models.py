@@ -36,7 +36,7 @@ class Utilisateur(django.contrib.auth.models.User):
     date_inscription = models.DateField()
     adresse = models.CharField(max_length=200, null=True)
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
-                              null=True)
+                              blank=True, null=True)
 
     def __str__(self):
         return self.last_name
