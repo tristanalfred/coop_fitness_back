@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from connection_front.serializers import UtilisateurSerializer, VilleSerializer
 from django.contrib.auth.models import User
 from connection_front.models import Ville
+from rest_framework import permissions
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -10,6 +11,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UtilisateurSerializer
+    permission_classes = [permissions.AllowAny]
 
 
 class VilleViewSet(viewsets.ModelViewSet):

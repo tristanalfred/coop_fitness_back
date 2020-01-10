@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
+router.register(r'villes', views.VilleViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
