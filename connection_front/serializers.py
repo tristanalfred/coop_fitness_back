@@ -6,10 +6,10 @@ from connection_front.models import Ville
 class UtilisateurSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = django.contrib.auth.models.User
-        fields = ['username', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined', 'email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined', 'email']
 
 
 class VilleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Ville
-        fields = ['nom']
+        fields = ['id', 'nom']

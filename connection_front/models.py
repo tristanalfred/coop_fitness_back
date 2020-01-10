@@ -34,9 +34,10 @@ class Choice(models.Model):
 # Classes courantes
 class Utilisateur(django.contrib.auth.models.User):
     date_inscription = models.DateField()
-    adresse = models.CharField(max_length=200, null=True)
+    adresse = models.CharField(max_length=200, blank=True, null=True)
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
+    image_profil = models.ImageField(blank=True, null=True, upload_to='images/')
 
     def __str__(self):
         return self.last_name
@@ -69,6 +70,10 @@ class MessageGroupe(models.Model):
     texte = models.CharField(max_length=300)
     date_envoi = models.DateField()
 
+    class Meta:
+        verbose_name = "message de groupe"
+        verbose_name_plural = "messages de groupe"
+
 
 class MessagePrive(models.Model):
     expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expéditeur", related_name='+')
@@ -76,6 +81,10 @@ class MessagePrive(models.Model):
                                      related_name='+')
     texte = models.CharField(max_length=300)
     date_envoi = models.DateField()
+
+    class Meta:
+        verbose_name = "message privé"
+        verbose_name_plural = "messages privé"
 
 
 class Invitation(models.Model):
@@ -92,6 +101,10 @@ class DemandeInscription(models.Model):
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     date_invitation = models.DateField()
     texte = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        verbose_name = "demande d'inscription"
+        verbose_name_plural = "demandes d'inscription"
 
 
 class Suivi(models.Model):
