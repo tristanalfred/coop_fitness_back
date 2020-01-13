@@ -1,0 +1,1 @@
+coverage run --omit=*/migrations/*,*/__init__.py,*/manage.py  manage.py test

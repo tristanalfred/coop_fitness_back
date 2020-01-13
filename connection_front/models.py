@@ -33,7 +33,7 @@ class Choice(models.Model):
 
 # Classes courantes
 class Utilisateur(django.contrib.auth.models.User):
-    date_inscription = models.DateField()
+    # date_inscription = models.DateField()
     adresse = models.CharField(max_length=200, blank=True, null=True)
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
