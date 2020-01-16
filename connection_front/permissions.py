@@ -6,9 +6,11 @@ class IsAdminOrSelf(permissions.BasePermission):
     N'autorise l"accès qu'aux administrateurs et à l'utilisateur lui-même.
     """
     def has_object_permission(self, request, view, obj):
+        # Administrateur
         if request.user and request.user.is_staff:
             return True
 
+        # Propriétaire
         elif request.user and obj.id == request.user.id:
             return True
 

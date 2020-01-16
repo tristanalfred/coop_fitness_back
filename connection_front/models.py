@@ -33,11 +33,12 @@ class Choice(models.Model):
 
 # Classes courantes
 class Utilisateur(django.contrib.auth.models.User):
-    # date_inscription = models.DateField()
     adresse = models.CharField(max_length=200, blank=True, null=True)
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
     image_profil = models.ImageField(blank=True, null=True, upload_to='images/')
+    # notif_app = models.BooleanField(default=False)
+    # notif_mail = models.BooleanField(default=False)
 
     def __str__(self):
         return self.last_name
