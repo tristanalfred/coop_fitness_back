@@ -66,6 +66,9 @@ class Ville(models.Model):
 
 
 class MessageGroupe(models.Model):
+    """
+    Message d'un utilisateur destiné à un groupe
+    """
     expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expéditeur", related_name='+')
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     texte = models.CharField(max_length=300)
@@ -77,6 +80,9 @@ class MessageGroupe(models.Model):
 
 
 class MessagePrive(models.Model):
+    """
+    Message d'un utilisateur destiné à un autre utilisateur
+    """
     expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expéditeur", related_name='+')
     destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
                                      related_name='+')
@@ -89,6 +95,9 @@ class MessagePrive(models.Model):
 
 
 class Invitation(models.Model):
+    """
+    Invitation à rejoindre un groupe
+    """
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
                                      related_name='+')
@@ -97,6 +106,9 @@ class Invitation(models.Model):
 
 
 class DemandeInscription(models.Model):
+    """
+    Demande à rejoindre un groupe
+    """
     destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
                                      related_name='+')
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
@@ -109,5 +121,8 @@ class DemandeInscription(models.Model):
 
 
 class Suivi(models.Model):
+    """
+    Permet de suivre un autre utilisateur
+    """
     interesse = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="interesse", related_name='+')
     concerne = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="concernte", related_name='+')

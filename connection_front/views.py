@@ -15,7 +15,7 @@ from rest_framework.decorators import action
 # Customs ViewSets
 class ReadUpdateSingleModelViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """
-    ViewSet ne permettant que de visualiser et modifier le modèle
+    ViewSet ne permettant que de visualiser et modifier un élément du modèle
     """
     pass
 
@@ -36,7 +36,7 @@ class PutOnlyModelViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    ViewSet permettant de visualiser les utilisateurs et de les modifier
     """
     queryset = Utilisateur.objects.all().order_by('-date_joined')
     serializer_class = UtilisateurSerializer
@@ -45,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class VilleViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows cities to be viewed or edited.
+    ViewSet permettant de visualiser les villes et de les modifier
     """
     queryset = Ville.objects.all().order_by('-id')
     serializer_class = VilleSerializer
@@ -54,7 +54,7 @@ class VilleViewSet(viewsets.ModelViewSet):
 
 class UtilisateurChangeViewSet(ReadUpdateSingleModelViewSet):
     """
-    Vue perrmettant à un Utilisateur d'accéder à ses informations personnelles et de les modifier
+    Vue permettant à un Utilisateur d'accéder à ses informations personnelles et de les modifier
     """
     queryset = Utilisateur.objects.all().order_by('-date_joined')
     serializer_class = UtilisateurChangeSerializer
@@ -63,7 +63,7 @@ class UtilisateurChangeViewSet(ReadUpdateSingleModelViewSet):
 
 class UtilisateurInscriptionViewSet(CreateOnlyModelViewSet):
     """
-    Vue permettant de créer un Utilisateur
+    Vue permettant de créer un Utilisateur (inscription)
     """
     queryset = Utilisateur.objects.none()
     serializer_class = UtilisateurInscriptionSerializer
@@ -71,6 +71,9 @@ class UtilisateurInscriptionViewSet(CreateOnlyModelViewSet):
 
 
 class UploadProfileViewSet(PutOnlyModelViewSet):
+    """
+    Vue permettant à un utilisateur de changer sa photo de profil
+    """
     serializer_class = UtilisateurUploadSerializer
     queryset = Utilisateur.objects.all()
     permission_classes = [perm.IsAdminOrSelf]
