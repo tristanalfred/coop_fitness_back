@@ -1,16 +1,12 @@
 import connection_front.permissions as perm
-import io
 
 from rest_framework import viewsets
 from connection_front.serializers import UtilisateurSerializer, VilleSerializer, UtilisateurChangeSerializer, \
-    UtilisateurInscriptionSerializer, UploadProfilImageSerializer, TestUtilisateurSerializer, ProfilePicSerializer, ProfileSerializer
+    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer
 from connection_front.models import Ville, Utilisateur
 from rest_framework import permissions, mixins
-import rest_framework.viewsets
 
 from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework import parsers
 from rest_framework import response
 from rest_framework.decorators import action
@@ -67,68 +63,22 @@ class UtilisateurChangeViewSet(ReadUpdateSingleModelViewSet):
 
 class UtilisateurInscriptionViewSet(CreateOnlyModelViewSet):
     """
-    Vue perrmettant de créer un Utilisateur
+    Vue permettant de créer un Utilisateur
     """
     queryset = Utilisateur.objects.none()
     serializer_class = UtilisateurInscriptionSerializer
     permission_classes = [permissions.AllowAny]
 
 
-@api_view(['GET', 'PUT', 'PATCH'])
-def UploadProfilImageViewSet(request, pk):
-    """
-    Retrieve, update or delete a code snippet.
-    """
-    try:
-        utilisateur = Utilisateur.objects.get(pk=pk)
-    except Utilisateur.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'PUT':
-        serializer = TestUtilisateurSerializer(utilisateur, data=request.data)
-        if serializer.is_valid():
-            # print(serializer.data)
-            # print(request.data)
-            # print(request.data.dict()['image_profile'])
-            # utilisateur.image_profil.url = request.data.dict()['image_profile']
-            # # utilisateur.image_profil.url = Utilisateur.objects.first().image_profil.url
-            # utilisateur.image_profil.width = 100
-            # utilisateur.image_profil.height = 100
-            # utilisateur.save()
-
-            # utilisateur.image_profil = data.image_profil
-            # utilisateur.save()
-
-            print(request.data)
-            print(request.FILES)
-            validatedData = serializer.validated_data
-            print(validatedData)
-            print(request.FILES.get('image_profil.url'))
-
-            request.FILES.appendlist('image_profil.height', 100)
-            request.FILES.appendlist('image_profil.width', 100)
-            print(request.FILES.get('image_profil.height'))
-
-            # user_profile = Utilisateur.objects.get(id=pk)
-            # user_profile.image_profil.url = request.FILES.get('image_profil.url')
-
-            serializer.save(image_profil=request.FILES.get('image_profil.url'))
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # Return this if request method is not POST
-    return Response({'key': 'value'}, status=status.HTTP_200_OK)
-
-
-class ProfileViewSet(PutOnlyModelViewSet):
-    serializer_class = ProfileSerializer
+class UploadProfileViewSet(PutOnlyModelViewSet):
+    serializer_class = UtilisateurUploadSerializer
     queryset = Utilisateur.objects.all()
     permission_classes = [perm.IsAdminOrSelf]
 
     @action(
         detail=True,
         methods=['PUT'],
-        serializer_class=ProfilePicSerializer,
+        serializer_class=UtilisateurUploadProfileSerializer,
         parser_classes=[parsers.MultiPartParser]
     )
     def image_profil(self, request, pk):

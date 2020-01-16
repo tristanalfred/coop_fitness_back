@@ -26,15 +26,12 @@ router.register(r'users', views.UserViewSet)
 router.register(r'villes', views.VilleViewSet)
 router.register(r'change', views.UtilisateurChangeViewSet)
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
-router.register(r'profiles', views.ProfileViewSet)
-# router.register(r'image_profile', views.UploadProfilImageViewSet, base_name='image_profile')
-# router.register(r'image_profile', views.UploadProfilImageViewSet)
+router.register(r'upload', views.UploadProfileViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('image_profile/<int:pk>', views.UploadProfilImageViewSet)
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
 if settings.DEBUG:
