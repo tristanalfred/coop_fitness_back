@@ -1,1 +1,4 @@
 coverage run --omit=*/migrations/*,*/__init__.py,*/manage.py  manage.py test
+
+
+python manage.py drf_create_token <username>
