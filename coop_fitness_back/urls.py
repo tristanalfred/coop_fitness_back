@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from connection_front import views
-from django.conf import settings
+from django.conf import settings, urls
 from django.conf.urls.static import static
 
 
@@ -26,12 +26,14 @@ router.register(r'users', views.UserViewSet)
 router.register(r'villes', views.VilleViewSet)
 router.register(r'change', views.UtilisateurChangeViewSet)
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
+router.register(r'compte', views.UtilisateurCompteViewSet)
 router.register(r'upload', views.UploadProfileViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    urls.url('^recherche_utilisateur/(?P<username>.+)/$', views.RechercheUtilisateurViewSet.as_view()),
 ]
 
 if settings.DEBUG:

@@ -2,7 +2,7 @@ import connection_front.permissions as perm
 
 from rest_framework import viewsets
 from connection_front.serializers import UtilisateurSerializer, VilleSerializer, UtilisateurChangeSerializer, \
-    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer
+    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer, MinimumUtilisateurSerializer
 from connection_front.models import Ville, Utilisateur
 from rest_framework import permissions, mixins
 
@@ -52,6 +52,15 @@ class VilleViewSet(viewsets.ModelViewSet):
     permission_classes = [perm.IsAdminOrAuthentifiedReadOnly]
 
 
+class UtilisateurCompteViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet permettant aux utilisateurs de visualiser leurs informations personnelles
+    """
+    queryset = Utilisateur.objects.all().order_by('-date_joined')
+    serializer_class = UtilisateurSerializer
+    permission_classes = [perm.IsAdminOrSelf]
+
+
 class UtilisateurChangeViewSet(ReadUpdateSingleModelViewSet):
     """
     Vue permettant à un Utilisateur d'accéder à ses informations personnelles et de les modifier
@@ -68,6 +77,21 @@ class UtilisateurInscriptionViewSet(CreateOnlyModelViewSet):
     queryset = Utilisateur.objects.none()
     serializer_class = UtilisateurInscriptionSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class RechercheUtilisateurViewSet(viewsets.generics.ListAPIView):
+    """
+    Vue permettant de rechercher des utilisateurs
+    """
+    serializer_class = MinimumUtilisateurSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases for
+        the user as determined by the username portion of the URL.
+        """
+        username = self.kwargs['username']
+        return Utilisateur.objects.filter(username=username)
 
 
 class UploadProfileViewSet(PutOnlyModelViewSet):

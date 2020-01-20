@@ -37,3 +37,9 @@ class UtilisateurUploadProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
         fields = ['image_profil']
+
+
+class MinimumUtilisateurSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Utilisateur
+        fields = ['username', 'image_profil']
