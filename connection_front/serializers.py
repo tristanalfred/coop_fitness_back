@@ -23,7 +23,8 @@ class VilleSerializer(serializers.HyperlinkedModelSerializer):
 class UtilisateurInscriptionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Utilisateur
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        # fields = '__all__'
+        exclude = ('password',)
 
 
 class UtilisateurUploadSerializer(serializers.ModelSerializer):

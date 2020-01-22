@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework import parsers
 from rest_framework import response
 from rest_framework.decorators import action
+from rest_framework import filters
 
 
 # Customs ViewSets
@@ -41,6 +42,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = Utilisateur.objects.all().order_by('-date_joined')
     serializer_class = UtilisateurSerializer
     permission_classes = [permissions.IsAdminUser]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 
 
 class VilleViewSet(viewsets.ModelViewSet):
