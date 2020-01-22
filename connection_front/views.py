@@ -1,9 +1,10 @@
 import connection_front.permissions as perm
 
 from rest_framework import viewsets
-from connection_front.serializers import UtilisateurSerializer, VilleSerializer, UtilisateurChangeSerializer, \
-    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer, MinimumUtilisateurSerializer
-from connection_front.models import Ville, Utilisateur
+from connection_front.serializers import DemandeInscriptionSerializer, InvitationSerializer, UtilisateurSerializer, \
+    VilleSerializer, UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer,\
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
+from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
 from rest_framework import permissions, mixins
 
 from rest_framework import status
@@ -120,3 +121,22 @@ class UploadProfileViewSet(PutOnlyModelViewSet):
             return response.Response(serializer.data)
         return response.Response(serializer.errors,
                                  status.HTTP_400_BAD_REQUEST)
+
+
+class InvitationViewSet(CreateOnlyModelViewSet):
+    serializer_class = InvitationSerializer
+    queryset = Invitation.objects.all()
+    permission_classes = [perm.IsAdminOrSelf]
+
+
+class DemandeInscriptionViewSet(viewsets.generics.CreateAPIView):
+    serializer_class = DemandeInscriptionSerializer
+    queryset = DemandeInscription.objects.all()
+    permission_classes = [perm.IsAdminOrSelf]
+
+    def create(self, request, *args, **kwargs):
+        print(request.user.id)
+        print(kwargs.get('groupe_id'))
+        inscription = DemandeInscription(expediteur_id=request.user.id, groupe_id=kwargs.get('groupe_id'), texte='default')
+        inscription.save()
+        return response.Response(status=204)

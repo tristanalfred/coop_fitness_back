@@ -50,12 +50,21 @@ class Permission(django.contrib.auth.models.Permission):
         return self.name
 
 
-class Groupe(django.contrib.auth.models.Group):
-    visible = models.BooleanField(default=False)
-    limited = models.BooleanField(default=False)
+class RoleUtilisateur(django.contrib.auth.models.Group):
 
     def __str__(self):
         return self.name
+
+
+class Groupe(models.Model):
+    nom = models.CharField(max_length=40)
+    createur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="créateur", related_name='+')
+    visible = models.BooleanField(default=False)
+    limited = models.BooleanField(default=False)
+    membres = models.ManyToManyField('Utilisateur', blank=True, verbose_name="membres", related_name='membres')
+
+    def __str__(self):
+        return self.nom
 
 
 class Ville(models.Model):
@@ -109,15 +118,16 @@ class DemandeInscription(models.Model):
     """
     Demande à rejoindre un groupe
     """
-    destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
+    expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expediteur",
                                      related_name='+')
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
-    date_invitation = models.DateField()
+    date_invitation = models.DateField(default=django.utils.timezone.now)
     texte = models.CharField(max_length=100, null=True)
 
     class Meta:
         verbose_name = "demande d'inscription"
         verbose_name_plural = "demandes d'inscription"
+        unique_together = ('expediteur', 'groupe')
 
 
 class Suivi(models.Model):

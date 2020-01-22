@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import DemandeInscription, Groupe, Invitation, MessageGroupe, MessagePrive, Permission, Suivi, \
-    Utilisateur, Ville
+from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, MessageGroupe, MessagePrive, Permission, \
+    Suivi, Utilisateur, Ville
 from django.utils.html import mark_safe
 
 
@@ -30,8 +30,22 @@ class UtilisateurAdmin(admin.ModelAdmin):
             return mark_safe('<img src="/media/images/default_user_profil.png" width=50 height=50 />')
 
 
+class GroupeAdmin(admin.ModelAdmin):
+    """
+    Changements de l'affichage d'un groupe pour une meilleur visibilité sur la page d'administration
+    """
+    list_display = ('nom', 'createur', 'total_membres', 'id')
+    ordering = ('id',)
+    search_fields = ('nom',)
+
+    readonly_fields = ["total_membres"]
+
+    def total_membres(self, obj):
+        return obj.membres.count()
+
+
 admin.site.register(DemandeInscription)
-admin.site.register(Groupe)
+admin.site.register(RoleUtilisateur)
 admin.site.register(Invitation)
 admin.site.register(MessageGroupe)
 admin.site.register(MessagePrive)
@@ -39,3 +53,4 @@ admin.site.register(Permission)
 admin.site.register(Suivi)
 admin.site.register(Utilisateur, UtilisateurAdmin)
 admin.site.register(Ville)
+admin.site.register(Groupe, GroupeAdmin)

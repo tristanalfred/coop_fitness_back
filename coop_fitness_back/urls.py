@@ -28,12 +28,14 @@ router.register(r'change', views.UtilisateurChangeViewSet)
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
 router.register(r'compte', views.UtilisateurCompteViewSet)
 router.register(r'upload', views.UploadProfileViewSet)
+router.register(r'invitation', views.InvitationViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     urls.url('^recherche_utilisateur/(?P<username>.+)/$', views.RechercheUtilisateurViewSet.as_view()),
+    urls.url('^demande-inscription/(?P<groupe_id>.+)/$', views.DemandeInscriptionViewSet.as_view()),
 ]
 
 if settings.DEBUG:

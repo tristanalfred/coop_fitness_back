@@ -47,3 +47,13 @@ class IsAdminOrAuthentifiedReadOnly(permissions.BasePermission):
             if request.user.is_staff:
                 return True
             return False
+
+
+class IsAdminOrAuthentifiedPostOnly(permissions.BasePermission):
+    """
+    Permission n'autorisant qu'à un utilisateur authentifié d'effectuer une action POST
+    """
+    def has_permission(self, request, view):
+        if (request.method == 'POST') and (request.user.is_authenticated or request.user.is_staff):
+            return True
+        return False
