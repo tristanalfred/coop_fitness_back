@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from connection_front.models import DemandeInscription, Groupe, Invitation, Utilisateur, Ville
+from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
 
 
 class UtilisateurSerializer(serializers.HyperlinkedModelSerializer):
