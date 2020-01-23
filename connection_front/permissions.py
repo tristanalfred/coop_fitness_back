@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from .models import DemandeInscription, Groupe
 
 """
 has_permission method will be called on all (GET, POST, PUT, DELETE) HTTP request.
@@ -23,11 +24,33 @@ class IsAdminOrSelf(permissions.BasePermission):
         return False
 
 
+class SelfExpedieur(permissions.BasePermission):
+    """
+    Permission n'autorisant un utilisateur qu'à poster des informations en son nom
+    (information présente dans le Body de la requête POST)
+    """
+    def has_permission(self, request, view):
+        if (request.method == 'POST') and (request.data['expediteur'] == str(request.user.id)):
+            return True
+        return False
+
+
+class IsGoupCreator(permissions.BasePermission):
+    """
+    Permission n'autorisant que le créateur du groupe passé en paramètre à accéder à une information
+    """
+    def has_permission(self, request, view):
+        if request.method == 'GET' \
+                and Groupe.objects.get(id=view.kwargs.get('groupe_id')).createur.id == request.user.id \
+                and request.user.is_authenticated:
+            return True
+        return False
+
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     Permission n'autorisant que le propriétaire d'une instance de modèle à la modifier
     """
-
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True

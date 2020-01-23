@@ -52,8 +52,7 @@ class InvitationSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class DemandeInscriptionSerializer(serializers.HyperlinkedModelSerializer):
+class DemandeInscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DemandeInscription
         fields = '__all__'
-

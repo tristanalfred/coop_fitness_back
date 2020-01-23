@@ -119,9 +119,9 @@ class DemandeInscription(models.Model):
     Demande à rejoindre un groupe
     """
     expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expediteur",
-                                     related_name='+')
+                                   related_name='+')
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
-    date_invitation = models.DateField(default=django.utils.timezone.now)
+    date_invitation = models.DateTimeField(default=django.utils.timezone.now)
     texte = models.CharField(max_length=100, null=True)
 
     class Meta:

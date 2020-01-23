@@ -36,6 +36,13 @@ class PutOnlyModelViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     pass
 
 
+class CreateReadOnlyViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """
+    ViewSet ne permettant que de visualiser et créer une instance du modèle
+    """
+    pass
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     ViewSet permettant de visualiser les utilisateurs et de les modifier
@@ -129,14 +136,17 @@ class InvitationViewSet(CreateOnlyModelViewSet):
     permission_classes = [perm.IsAdminOrSelf]
 
 
-class DemandeInscriptionViewSet(viewsets.generics.CreateAPIView):
+class DemandeInscriptionViewSet(CreateReadOnlyViewSet):
     serializer_class = DemandeInscriptionSerializer
     queryset = DemandeInscription.objects.all()
-    permission_classes = [perm.IsAdminOrSelf]
+    permission_classes = [perm.SelfExpedieur]
 
-    def create(self, request, *args, **kwargs):
-        print(request.user.id)
-        print(kwargs.get('groupe_id'))
-        inscription = DemandeInscription(expediteur_id=request.user.id, groupe_id=kwargs.get('groupe_id'), texte='default')
-        inscription.save()
-        return response.Response(status=204)
+
+class ManageDemandeInscriptionViewSet(viewsets.generics.ListAPIView):
+    serializer_class = DemandeInscriptionSerializer
+    queryset = DemandeInscription.objects.all()
+    permission_classes = [perm.IsGoupCreator]
+
+    def get_queryset(self):
+        groupe_id = self.kwargs['groupe_id']
+        return DemandeInscription.objects.filter(groupe_id=groupe_id)
