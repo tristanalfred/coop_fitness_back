@@ -1,9 +1,10 @@
 import connection_front.permissions as perm
 
 from rest_framework import viewsets
-from connection_front.serializers import DemandeInscriptionSerializer, InvitationSerializer, UtilisateurSerializer, \
-    VilleSerializer, UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer,\
-    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
+from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
+    InvitationSerializer, UtilisateurSerializer, VilleSerializer, UtilisateurChangeSerializer, \
+    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer, \
+    MinimumUtilisateurSerializer
 from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
 from rest_framework import permissions, mixins
 
@@ -131,19 +132,28 @@ class UploadProfileViewSet(PutOnlyModelViewSet):
 
 
 class InvitationViewSet(CreateOnlyModelViewSet):
+    """
+    Vue permettant au créateur d'un groupe d'envoyer une inscription à un utilisateur
+    """
     serializer_class = InvitationSerializer
     queryset = Invitation.objects.all()
-    permission_classes = [perm.IsAdminOrSelf]
+    permission_classes = [perm.IsGroupCreatorPost]
 
 
 class DemandeInscriptionViewSet(CreateReadOnlyViewSet):
+    """
+    Vue permettant à un utilisateur d'envoyer une demande d'inscription à un groupe
+    """
     serializer_class = DemandeInscriptionSerializer
     queryset = DemandeInscription.objects.all()
     permission_classes = [perm.SelfExpedieur]
 
 
 class ManageDemandeInscriptionViewSet(viewsets.generics.ListAPIView):
-    serializer_class = DemandeInscriptionSerializer
+    """
+    Vue permettant au créateur d'un groupe de visualiser toutes les demandes
+    """
+    serializer_class = DemandeInscriptionUtilisateurSerializer
     queryset = DemandeInscription.objects.all()
     permission_classes = [perm.IsGoupCreator]
 

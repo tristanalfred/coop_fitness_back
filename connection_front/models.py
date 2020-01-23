@@ -110,8 +110,11 @@ class Invitation(models.Model):
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
                                      related_name='+')
-    date_invitation = models.DateField()
+    date_invitation = models.DateTimeField(default=django.utils.timezone.now)
     texte = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        unique_together = ('groupe', 'destinataire')
 
 
 class DemandeInscription(models.Model):

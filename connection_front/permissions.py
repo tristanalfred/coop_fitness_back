@@ -30,7 +30,19 @@ class SelfExpedieur(permissions.BasePermission):
     (information présente dans le Body de la requête POST)
     """
     def has_permission(self, request, view):
+        Groupe.objects.filter(createur=request.user.id).filter(id=request.data['expediteur'])
         if (request.method == 'POST') and (request.data['expediteur'] == str(request.user.id)):
+            return True
+        return False
+
+
+class IsGroupCreatorPost(permissions.BasePermission):
+    """
+    Permission n'autorisant que le créateur du groupe passé en paramètre à créer un objet
+    """
+    def has_permission(self, request, view):
+        is_creator = Groupe.objects.filter(createur=request.user.id).filter(id=request.data['groupe']).count()
+        if request.method == 'POST' and is_creator:
             return True
         return False
 

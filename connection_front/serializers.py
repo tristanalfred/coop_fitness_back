@@ -46,13 +46,24 @@ class MinimumUtilisateurSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['username', 'image_profil']
 
 
-class InvitationSerializer(serializers.HyperlinkedModelSerializer):
+class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = '__all__'
 
 
 class DemandeInscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DemandeInscription
+        fields = '__all__'
+
+
+class DemandeInscriptionUtilisateurSerializer(serializers.ModelSerializer):
+    """
+    Serialise une demande d'inscription, mais remplace l'id de l'expéditeur par son nom
+    """
+    expediteur = serializers.StringRelatedField()
+
     class Meta:
         model = DemandeInscription
         fields = '__all__'
