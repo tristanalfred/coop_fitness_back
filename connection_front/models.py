@@ -37,8 +37,13 @@ class Utilisateur(django.contrib.auth.models.User):
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
     image_profil = models.ImageField(blank=True, null=True, upload_to='images/')
+    groupes = models.ManyToManyField('Groupe', blank=True, verbose_name="groupes", related_name='+')
     # notif_app = models.BooleanField(default=False)
     # notif_mail = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'utilisateur'
+        verbose_name_plural = 'utilisateurs'
 
     def __str__(self):
         return self.last_name
@@ -61,7 +66,7 @@ class Groupe(models.Model):
     createur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="créateur", related_name='+')
     visible = models.BooleanField(default=False)
     limited = models.BooleanField(default=False)
-    membres = models.ManyToManyField('Utilisateur', blank=True, verbose_name="membres", related_name='membres')
+    membres = models.ManyToManyField('Utilisateur', blank=True, verbose_name="membres", related_name='+')
 
     def __str__(self):
         return self.nom
