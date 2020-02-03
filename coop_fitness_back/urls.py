@@ -37,6 +37,13 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     urls.url('^recherche_utilisateur/(?P<username>.+)/$', views.RechercheUtilisateurViewSet.as_view()),
     urls.url('^groupe/(?P<groupe_id>.+)/demande-inscription/$', views.ManageDemandeInscriptionViewSet.as_view()),
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/invitation/$', views.ManageInvitationViewSet.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/accepte-demande/(?P<demande_id>.+)/$', views.AccepteDemandeAPIView.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/refuse-demande/(?P<demande_id>.+)/$', views.RefuseDemandeAPIView.as_view()),
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/accepte-invitation/(?P<invitation_id>.+)/$',
+             views.AccepteInvitationAPIView.as_view()),
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/refuse-invitation/(?P<invitation_id>.+)/$',
+             views.RefuseInvitationAPIView.as_view()),
 ]
 
 if settings.DEBUG:

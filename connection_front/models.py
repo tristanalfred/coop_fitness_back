@@ -117,6 +117,7 @@ class Invitation(models.Model):
                                      related_name='+')
     date_invitation = models.DateTimeField(default=django.utils.timezone.now)
     texte = models.CharField(max_length=100, null=True)
+    accepte = models.BooleanField(null=True)
 
     class Meta:
         unique_together = ('groupe', 'destinataire')
@@ -131,6 +132,7 @@ class DemandeInscription(models.Model):
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     date_invitation = models.DateTimeField(default=django.utils.timezone.now)
     texte = models.CharField(max_length=100, null=True)
+    accepte = models.BooleanField(null=True)
 
     class Meta:
         verbose_name = "demande d'inscription"

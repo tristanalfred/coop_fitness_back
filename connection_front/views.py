@@ -2,9 +2,9 @@ import connection_front.permissions as perm
 
 from rest_framework import viewsets
 from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
-    InvitationSerializer, UtilisateurSerializer, VilleSerializer, UtilisateurChangeSerializer, \
-    UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, UtilisateurUploadSerializer, \
-    MinimumUtilisateurSerializer
+    InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
+    UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
 from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
 from rest_framework import permissions, mixins
 
@@ -13,6 +13,7 @@ from rest_framework import parsers
 from rest_framework import response
 from rest_framework.decorators import action
 from rest_framework import filters
+from rest_framework.views import APIView
 
 
 # Customs ViewSets
@@ -160,3 +161,84 @@ class ManageDemandeInscriptionViewSet(viewsets.generics.ListAPIView):
     def get_queryset(self):
         groupe_id = self.kwargs['groupe_id']
         return DemandeInscription.objects.filter(groupe_id=groupe_id)
+
+
+class ManageInvitationViewSet(viewsets.generics.ListAPIView):
+    """
+    Vue permettant à un utilisateur de visualiser toutes les invitations
+    """
+    serializer_class = InvitationGroupeSerializer
+    queryset = Invitation.objects.all()
+    permission_classes = [perm.IsSelfUtilisateurInPath]
+
+    def get_queryset(self):
+        utilisateur_id = self.kwargs['utilisateur_id']
+        return Invitation.objects.filter(destinataire_id=utilisateur_id)
+
+
+class AccepteDemandeAPIView(APIView):
+    """
+    Vue permettant à un createur de groupe d'accepter une demande d'inscription
+    """
+    permission_classes = [perm.IsGroupCreatorPatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = DemandeInscription.objects.filter(id=kwargs.get('demande_id')).filter(
+            groupe__id=kwargs.get('groupe_id')).count()
+        if existe != 0:
+            demande = DemandeInscription.objects.get(id=kwargs.get('demande_id'))
+            demande.accepte = True
+            demande.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class RefuseDemandeAPIView(APIView):
+    """
+    Vue permettant à un createur de groupe de refuser une demande d'inscription
+    """
+    permission_classes = [perm.IsGroupCreatorPatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = DemandeInscription.objects.filter(id=kwargs.get('demande_id')).filter(
+            groupe__id=kwargs.get('groupe_id')).count()
+        if existe != 0:
+            demande = DemandeInscription.objects.get(id=kwargs.get('demande_id'))
+            demande.accepte = False
+            demande.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class AccepteInvitationAPIView(APIView):
+    """
+    Vue permettant à un utilisateur d'accepter une invitation
+    """
+    permission_classes = [perm.IsDestinatairePatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = Invitation.objects.filter(id=kwargs.get('invitation_id')).filter(
+            destinataire__id=kwargs.get('utilisateur_id')).count()
+        if existe != 0:
+            demande = Invitation.objects.get(id=kwargs.get('invitation_id'))
+            demande.accepte = True
+            demande.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class RefuseInvitationAPIView(APIView):
+    """
+    Vue permettant à un utilisateur de refuser une invitation
+    """
+    permission_classes = [perm.IsDestinatairePatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = Invitation.objects.filter(id=kwargs.get('invitation_id')).filter(
+            destinataire__id=kwargs.get('utilisateur_id')).count()
+        if existe != 0:
+            demande = Invitation.objects.get(id=kwargs.get('invitation_id'))
+            demande.accepte = False
+            demande.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)

@@ -52,6 +52,17 @@ class InvitationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class InvitationGroupeSerializer(serializers.ModelSerializer):
+    """
+    Serialise une invitations, mais remplace l'id du groupe par son nom
+    """
+    groupe = serializers.StringRelatedField()
+
+    class Meta:
+        model = Invitation
+        fields = '__all__'
+
+
 class DemandeInscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DemandeInscription

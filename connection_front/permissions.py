@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import DemandeInscription, Groupe
+from .models import Groupe
 
 """
 has_permission method will be called on all (GET, POST, PUT, DELETE) HTTP request.
@@ -24,6 +24,18 @@ class IsAdminOrSelf(permissions.BasePermission):
         return False
 
 
+class IsSelfUtilisateurInPath(permissions.BasePermission):
+    """
+    Permission n'autorisant que l'utilisateur passé en paramètre à accéder à une information
+    """
+    def has_permission(self, request, view):
+        if request.method == 'GET' \
+                and view.kwargs.get('utilisateur_id') == str(request.user.id) \
+                and request.user.is_authenticated:
+            return True
+        return False
+
+
 class SelfExpedieur(permissions.BasePermission):
     """
     Permission n'autorisant un utilisateur qu'à poster des informations en son nom
@@ -43,6 +55,30 @@ class IsGroupCreatorPost(permissions.BasePermission):
     def has_permission(self, request, view):
         is_creator = Groupe.objects.filter(createur=request.user.id).filter(id=request.data['groupe']).count()
         if request.method == 'POST' and is_creator:
+            return True
+        return False
+
+
+class IsGroupCreatorPatch(permissions.BasePermission):
+    """
+    Permission n'autorisant que le créateur du groupe passé en paramètre à modifier un objet
+    """
+    def has_permission(self, request, view):
+        if request.method == 'PATCH' \
+                and Groupe.objects.get(id=view.kwargs.get('groupe_id')).createur.id == request.user.id \
+                and request.user.is_authenticated:
+            return True
+        return False
+
+
+class IsDestinatairePatch(permissions.BasePermission):
+    """
+    Permission n'autorisant que le destinataire passé en paramètre à modifier un objet
+    """
+    def has_permission(self, request, view):
+        if request.method == 'PATCH' \
+                and view.kwargs.get('utilisateur_id') == str(request.user.id) \
+                and request.user.is_authenticated:
             return True
         return False
 
