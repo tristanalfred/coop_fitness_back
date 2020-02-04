@@ -58,7 +58,7 @@ class Permission(django.contrib.auth.models.Permission):
 class RoleUtilisateur(django.contrib.auth.models.Group):
 
     def __str__(self):
-        return self.name
+        return self.name 
 
 
 class Groupe(models.Model):
