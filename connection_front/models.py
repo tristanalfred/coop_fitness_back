@@ -63,13 +63,24 @@ class RoleUtilisateur(django.contrib.auth.models.Group):
 
 class Groupe(models.Model):
     nom = models.CharField(max_length=40)
-    createur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="créateur", related_name='+')
     visible = models.BooleanField(default=False)
     limited = models.BooleanField(default=False)
-    membres = models.ManyToManyField('Utilisateur', blank=True, verbose_name="membres", related_name='+')
+    # membres = models.ManyToManyField('MembreGroupe', verbose_name="membres", related_name='+')
 
     def __str__(self):
         return self.nom
+
+
+class MembreGroupe(models.Model):
+    membre = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="membre", related_name='+')
+    groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
+    createur = models.BooleanField(default=False)
+    responsable = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.membre.username
+        # return self.membre.username + ' | ' + \
+        #        ('createur' if self.createur else 'responsable' if self.responsable else 'membre')
 
 
 class Ville(models.Model):

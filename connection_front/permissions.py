@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import Groupe
+from .models import Groupe, MembreGroupe
 
 """
 has_permission method will be called on all (GET, POST, PUT, DELETE) HTTP request.
@@ -42,7 +42,6 @@ class SelfExpedieur(permissions.BasePermission):
     (information présente dans le Body de la requête POST)
     """
     def has_permission(self, request, view):
-        Groupe.objects.filter(createur=request.user.id).filter(id=request.data['expediteur'])
         if (request.method == 'POST') and (request.data['expediteur'] == str(request.user.id)):
             return True
         return False
@@ -53,7 +52,8 @@ class IsGroupCreatorPost(permissions.BasePermission):
     Permission n'autorisant que le créateur du groupe passé en paramètre à créer un objet
     """
     def has_permission(self, request, view):
-        is_creator = Groupe.objects.filter(createur=request.user.id).filter(id=request.data['groupe']).count()
+        is_creator = MembreGroupe.objects.filter(groupe__id=request.data['groupe']).filter(
+            membre__id=request.user.id).filter(createur=True).count()
         if request.method == 'POST' and is_creator:
             return True
         return False
@@ -65,7 +65,7 @@ class IsGroupCreatorPatch(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.method == 'PATCH' \
-                and Groupe.objects.get(id=view.kwargs.get('groupe_id')).createur.id == request.user.id \
+                and MembreGroupe.objects.get(groupe__id=view.kwargs.get('groupe_id')).id == request.user.id \
                 and request.user.is_authenticated:
             return True
         return False
@@ -89,7 +89,7 @@ class IsGoupCreator(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.method == 'GET' \
-                and Groupe.objects.get(id=view.kwargs.get('groupe_id')).createur.id == request.user.id \
+                and MembreGroupe.objects.get(groupe__id=view.kwargs.get('groupe_id')).id == request.user.id \
                 and request.user.is_authenticated:
             return True
         return False

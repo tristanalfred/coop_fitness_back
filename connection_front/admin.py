@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, MessageGroupe, MessagePrive, Permission, \
-    Suivi, Utilisateur, Ville
+from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, MembreGroupe, MessageGroupe, MessagePrive, \
+    Permission, Suivi, Utilisateur, Ville
 from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin
 
@@ -26,7 +26,7 @@ class UtilisateurAdmin(UserAdmin):
 
     filter_horizontal = ('groupes',)
 
-    readonly_fields = ["apercu_image"]
+    readonly_fields = ['apercu_image']
 
     def apercu_image(self, obj):
         """
@@ -43,6 +43,18 @@ class UtilisateurAdmin(UserAdmin):
             return mark_safe('<img src="/media/images/default_user_profil.png" width=50 height=50 />')
 
 
+class MembresAdmin(admin.TabularInline):
+    model = MembreGroupe
+
+    fieldsets = (
+        (None, {'fields': ('membre', 'createur', 'responsable')}),
+    )
+
+    readonly_fields = ["createur"]
+
+    # fields = ["membre", "createur", "responsable"]
+
+
 class GroupeAdmin(admin.ModelAdmin):
     """
     Changements de l'affichage d'un groupe pour une meilleur visibilité sur la page d'administration
@@ -51,12 +63,20 @@ class GroupeAdmin(admin.ModelAdmin):
     ordering = ('id',)
     search_fields = ('nom',)
 
-    readonly_fields = ["total_membres"]
+    fieldsets = (
+        (None, {'fields': ('nom', 'createur', 'visible', 'limited')}),
+    )
 
-    filter_horizontal = ('membres',)
+    readonly_fields = ['total_membres', 'createur']
+
+    # filter_horizontal = ('membres',)
+    inlines = [MembresAdmin, ]
 
     def total_membres(self, obj):
-        return obj.membres.count()
+        return MembreGroupe.objects.filter(groupe__id=obj.id).count()
+
+    def createur(self, obj):
+        return MembreGroupe.objects.filter(groupe__id=obj.id).get(createur=True)
 
 
 class DemandeInscriptionAdmin(admin.ModelAdmin):
@@ -85,3 +105,5 @@ admin.site.register(Suivi)
 admin.site.register(Utilisateur, UtilisateurAdmin)
 admin.site.register(Ville)
 admin.site.register(Groupe, GroupeAdmin)
+# admin.site.register(Groupe)
+admin.site.register(MembreGroupe)

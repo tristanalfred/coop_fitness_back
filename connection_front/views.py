@@ -134,7 +134,7 @@ class UploadProfileViewSet(PutOnlyModelViewSet):
 
 class InvitationViewSet(CreateOnlyModelViewSet):
     """
-    Vue permettant au créateur d'un groupe d'envoyer une inscription à un utilisateur
+    Vue permettant au créateur d'un groupe d'envoyer une invitation à un utilisateur
     """
     serializer_class = InvitationSerializer
     queryset = Invitation.objects.all()
