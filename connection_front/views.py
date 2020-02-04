@@ -4,8 +4,8 @@ from rest_framework import viewsets
 from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
     InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
     UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
-    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
-from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer
+from connection_front.models import DemandeInscription, Invitation, MembreGroupe, Utilisateur, Ville
 from rest_framework import permissions, mixins
 
 from rest_framework import status
@@ -240,5 +240,41 @@ class RefuseInvitationAPIView(APIView):
             demande = Invitation.objects.get(id=kwargs.get('invitation_id'))
             demande.accepte = False
             demande.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class RendResponsableAPIView(APIView):
+    """
+    Vue permettant à un createur de groupe de donner les privilèges de responsable à un membre du groupe
+    """
+    permission_classes = [perm.IsGroupCreatorPatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = MembreGroupe.objects.filter(groupe__id=kwargs.get('groupe_id')).filter(
+            membre__id=kwargs.get('membre_id')).count()
+        if existe != 0:
+            membregroupe = MembreGroupe.objects.filter(groupe__id=kwargs.get('groupe_id')).get(
+                membre__id=kwargs.get('membre_id'))
+            membregroupe.responsable = True
+            membregroupe.save()
+            return response.Response(status.HTTP_202_ACCEPTED)
+        return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class RetireResponsableAPIView(APIView):
+    """
+    Vue permettant à un createur de groupe de retirer les privilèges de responsable à un membre du groupe
+    """
+    permission_classes = [perm.IsGroupCreatorPatch]
+
+    def patch(self, *_args, **kwargs):
+        existe = MembreGroupe.objects.filter(groupe__id=kwargs.get('groupe_id')).filter(
+            membre__id=kwargs.get('membre_id')).count()
+        if existe != 0:
+            membregroupe = MembreGroupe.objects.filter(groupe__id=kwargs.get('groupe_id')).get(
+                membre__id=kwargs.get('membre_id'))
+            membregroupe.responsable = False
+            membregroupe.save()
             return response.Response(status.HTTP_202_ACCEPTED)
         return response.Response(status.HTTP_404_NOT_FOUND)

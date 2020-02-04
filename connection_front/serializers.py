@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from connection_front.models import DemandeInscription, Invitation, Utilisateur, Ville
+from connection_front.models import DemandeInscription, Invitation, MembreGroupe, Utilisateur, Ville
 
 
 class UtilisateurSerializer(serializers.HyperlinkedModelSerializer):
@@ -44,6 +44,12 @@ class MinimumUtilisateurSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Utilisateur
         fields = ['username', 'image_profil']
+
+
+class MembreGroupeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembreGroupe
+        fields = '__all__'
 
 
 class InvitationSerializer(serializers.ModelSerializer):

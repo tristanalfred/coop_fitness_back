@@ -65,7 +65,7 @@ class IsGroupCreatorPatch(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.method == 'PATCH' \
-                and MembreGroupe.objects.get(groupe__id=view.kwargs.get('groupe_id')).id == request.user.id \
+                and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id')).filter(membre__id=request.user.id).filter(createur=True).count() == 1 \
                 and request.user.is_authenticated:
             return True
         return False
