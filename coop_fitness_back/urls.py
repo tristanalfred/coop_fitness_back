@@ -21,10 +21,10 @@ from django.conf import settings, urls
 from django.conf.urls.static import static
 
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'users', views.UserViewSet, base_name='utilisateurs')
 router.register(r'villes', views.VilleViewSet)
-router.register(r'change', views.UtilisateurChangeViewSet)
+router.register(r'change', views.UtilisateurChangeViewSet, base_name='change')
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
 router.register(r'compte', views.UtilisateurCompteViewSet)
 router.register(r'upload', views.UploadProfileViewSet)

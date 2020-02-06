@@ -52,8 +52,6 @@ class MembresAdmin(admin.TabularInline):
 
     readonly_fields = ["createur"]
 
-    # fields = ["membre", "createur", "responsable"]
-
 
 class GroupeAdmin(admin.ModelAdmin):
     """
@@ -64,7 +62,7 @@ class GroupeAdmin(admin.ModelAdmin):
     search_fields = ('nom',)
 
     fieldsets = (
-        (None, {'fields': ('nom', 'createur', 'visible', 'limited')}),
+        (None, {'fields': ('nom', 'createur', 'visible', 'limited', 'total_membres')}),
     )
 
     readonly_fields = ['total_membres', 'createur']
