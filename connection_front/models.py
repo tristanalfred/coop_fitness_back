@@ -77,6 +77,9 @@ class MembreGroupe(models.Model):
     createur = models.BooleanField(default=False)
     responsable = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ('membre', 'groupe')
+
     def __str__(self):
         return self.membre.username
         # return self.membre.username + ' | ' + \
