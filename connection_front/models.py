@@ -152,6 +152,7 @@ class DemandeInscription(models.Model):
         verbose_name = "demande d'inscription"
         verbose_name_plural = "demandes d'inscription"
         unique_together = ('expediteur', 'groupe')
+        ordering = ['-id']
 
 
 class Suivi(models.Model):

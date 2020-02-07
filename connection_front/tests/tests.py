@@ -6,8 +6,9 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
-from connection_front.models import Groupe, MembreGroupe, Utilisateur
-from requests.auth import HTTPBasicAuth
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur
+from PIL import Image
+import tempfile
 
 
 class UtilisateurTest(TestCase):
@@ -49,7 +50,7 @@ class MembreGroupeTest(TestCase):
             MembreGroupe.objects.create(membre=Utilisateur.objects.get(username='user1'), groupe=Groupe.objects.first())
 
 
-class UtilisateurTests(APITestCase):
+class BasicAPITests(APITestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -80,6 +81,11 @@ class UtilisateurTests(APITestCase):
         cls.client2 = APIClient()
         cls.client2.login(username='user2', password='mdp')
 
+        Groupe.objects.create(nom='groupe1')
+        MembreGroupe.objects.create(membre=utilisateur1, groupe=Groupe.objects.first(), createur=True, responsable=True)
+
+
+class UtilisateurTests(BasicAPITests):
     def test_inscription_utilisateur(self):
         """
         Inscription d'un nouvel utilisateur
@@ -135,7 +141,7 @@ class UtilisateurTests(APITestCase):
 
     def test_api_change_utilisateur_ko(self):
         """
-        Modification d'un compte utilisateur
+        Modification d'un autre compte utilisateur
         """
         url = reverse('change-detail', kwargs={'pk': '1'})
         data = {'username': 'user1', 'adresse': 'autre'}
@@ -144,3 +150,159 @@ class UtilisateurTests(APITestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertNotEqual(nouvelle_adresse, 'autre')
+
+    def test_api_compte_utilisateur(self):
+        """
+        Visualisation d'un compte utilisateur
+        """
+        url = reverse('compte-detail', kwargs={'pk': '2'})
+        response = self.client2.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_api_compte_utilisateur_ko(self):
+        """
+        Visualisation d'un autre compte utilisateur
+        """
+        url = reverse('compte-detail', kwargs={'pk': '2'})
+        response = self.client1.get(url, format='json')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_api_upload_image_profile(self):
+        with self.assertRaises(ValueError):
+            _ancienne_image = Utilisateur.objects.get(id=2).image_profil.url
+
+        image = Image.new('RGB', (100, 100))
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        image.save(tmp_file)
+        tmp_file.seek(0)
+
+        url = reverse('utilisateur-image-profil', kwargs={'pk': '2'})
+        data = {'image_profil': tmp_file}
+        response = self.client2.put(url, data, format='multipart')
+        nouvelle_image = Utilisateur.objects.get(id=2).image_profil.url
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(nouvelle_image)
+
+
+class GroupeTests(BasicAPITests):
+    def test_api_invitation(self):
+        url = reverse('invitation-list')
+        data = {
+            'groupe': '1',
+            'destinataire': '2'
+        }
+        response = self.client1.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 1)
+
+    def test_api_invitation_doublon_ko(self):
+        url = reverse('invitation-list')
+        data = {
+            'groupe': '1',
+            'destinataire': '2'
+        }
+        self.client1.post(url, data, format='json')
+        response = self.client1.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 1)
+
+    def test_api_invitation_autre_utilisateur_ko(self):
+        url = reverse('invitation-list')
+        data = {
+            'groupe': '1',
+            'destinataire': '2'
+        }
+        response = self.client2.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 0)
+
+    def test_api_demande_inscription(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        response = self.client2.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 1)
+
+    def test_api_demande_inscription_doublon_ko(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        self.client2.post(url, data, format='json')
+        response = self.client2.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 1)
+
+    def test_api_demande_inscription_autre_utilisateur_ko(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        response = self.client1.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 0)
+
+    def test_api_groupe_get_demande_inscription(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        self.client2.post(url, data, format='json')
+        response = self.client1.get('/groupe/1/demande-inscription', format='json', follow=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(list(response.data.items())[0][1], DemandeInscription.objects.filter(groupe__id=1).count())
+
+    def test_api_groupe_accepte_demande(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        self.client2.post(url, data, format='json')
+
+        ancien_etat_demande = DemandeInscription.objects.get(id=1).accepte
+
+        response = self.client1.patch('/groupe/1/accepte-demande/1', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(ancien_etat_demande, None)
+        self.assertEqual(DemandeInscription.objects.get(id=1).accepte, True)
+
+    def test_api_groupe_refuse_demande(self):
+        url = reverse('demandeinscription-list')
+        data = {
+            'expediteur': '2',
+            'groupe': '1'
+        }
+        self.client2.post(url, data, format='json')
+
+        ancien_etat_demande = DemandeInscription.objects.get(id=1).accepte
+
+        response = self.client1.patch('/groupe/1/refuse-demande/1', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(ancien_etat_demande, None)
+        self.assertEqual(DemandeInscription.objects.get(id=1).accepte, False)
+
+    def test_api_groupe_rend_responsable(self):
+        MembreGroupe.objects.create(membre=Utilisateur.objects.get(id=2), groupe=Groupe.objects.first())
+
+        response = self.client1.patch('/groupe/1/rend-responsable/2', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(MembreGroupe.objects.filter(groupe__id=1).get(membre__id=2).responsable, True)
+
+    def test_api_groupe_retire_responsable(self):
+        MembreGroupe.objects.create(membre=Utilisateur.objects.get(id=2), groupe=Groupe.objects.first(),
+                                    responsable=True)
+
+        response = self.client1.patch('/groupe/1/retire-responsable/2', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(MembreGroupe.objects.filter(groupe__id=1).get(membre__id=2).responsable, False)

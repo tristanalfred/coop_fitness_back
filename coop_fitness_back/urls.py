@@ -26,7 +26,7 @@ router.register(r'users', views.UserViewSet, base_name='utilisateurs')
 router.register(r'villes', views.VilleViewSet)
 router.register(r'change', views.UtilisateurChangeViewSet, base_name='change')
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
-router.register(r'compte', views.UtilisateurCompteViewSet)
+router.register(r'compte', views.UtilisateurCompteViewSet, base_name='compte')
 router.register(r'upload', views.UploadProfileViewSet)
 router.register(r'invitation', views.InvitationViewSet)
 router.register(r'demande-inscription', views.DemandeInscriptionViewSet)
@@ -35,17 +35,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    urls.url('^recherche_utilisateur/(?P<username>.+)/$', views.RechercheUtilisateurViewSet.as_view()),
-    urls.url('^groupe/(?P<groupe_id>.+)/demande-inscription/$', views.ManageDemandeInscriptionViewSet.as_view()),
-    urls.url('^utilisateur/(?P<utilisateur_id>.+)/invitation/$', views.ManageInvitationViewSet.as_view()),
-    urls.url('^groupe/(?P<groupe_id>.+)/accepte-demande/(?P<demande_id>.+)/$', views.AccepteDemandeAPIView.as_view()),
-    urls.url('^groupe/(?P<groupe_id>.+)/refuse-demande/(?P<demande_id>.+)/$', views.RefuseDemandeAPIView.as_view()),
-    urls.url('^utilisateur/(?P<utilisateur_id>.+)/accepte-invitation/(?P<invitation_id>.+)/$',
+    urls.url('^recherche_utilisateur/(?P<username>.+)$', views.RechercheUtilisateurViewSet.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/demande-inscription$', views.ManageDemandeInscriptionViewSet.as_view()),
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/invitation$', views.ManageInvitationViewSet.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/accepte-demande/(?P<demande_id>.+)$', views.AccepteDemandeAPIView.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/refuse-demande/(?P<demande_id>.+)$', views.RefuseDemandeAPIView.as_view()),
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/accepte-invitation/(?P<invitation_id>.+)$',
              views.AccepteInvitationAPIView.as_view()),
-    urls.url('^utilisateur/(?P<utilisateur_id>.+)/refuse-invitation/(?P<invitation_id>.+)/$',
+    urls.url('^utilisateur/(?P<utilisateur_id>.+)/refuse-invitation/(?P<invitation_id>.+)$',
              views.RefuseInvitationAPIView.as_view()),
-    urls.url('^groupe/(?P<groupe_id>.+)/rend-responsable/(?P<membre_id>.+)/$', views.RendResponsableAPIView.as_view()),
-    urls.url('^groupe/(?P<groupe_id>.+)/retire-responsable/(?P<membre_id>.+)/$', views.RetireResponsableAPIView.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/rend-responsable/(?P<membre_id>.+)$', views.RendResponsableAPIView.as_view()),
+    urls.url('^groupe/(?P<groupe_id>.+)/retire-responsable/(?P<membre_id>.+)$', views.RetireResponsableAPIView.as_view()),
 ]
 
 if settings.DEBUG:

@@ -89,7 +89,7 @@ class IsGoupCreator(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.method == 'GET' \
-                and MembreGroupe.objects.get(groupe__id=view.kwargs.get('groupe_id')).id == request.user.id \
+                and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id')).get(createur=True).membre.id == request.user.id \
                 and request.user.is_authenticated:
             return True
         return False
