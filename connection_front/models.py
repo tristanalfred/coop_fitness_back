@@ -58,14 +58,13 @@ class Permission(django.contrib.auth.models.Permission):
 class RoleUtilisateur(django.contrib.auth.models.Group):
 
     def __str__(self):
-        return self.name 
+        return self.name
 
 
 class Groupe(models.Model):
     nom = models.CharField(max_length=40)
     visible = models.BooleanField(default=False)
     limited = models.BooleanField(default=False)
-    # membres = models.ManyToManyField('MembreGroupe', verbose_name="membres", related_name='+')
 
     def __str__(self):
         return self.nom
@@ -135,6 +134,7 @@ class Invitation(models.Model):
 
     class Meta:
         unique_together = ('groupe', 'destinataire')
+        ordering = ['-id']
 
 
 class DemandeInscription(models.Model):

@@ -1,13 +1,11 @@
 import connection_front.permissions as perm
-
 from rest_framework import viewsets
 from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
     InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
     UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
-    UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
 from connection_front.models import DemandeInscription, Invitation, MembreGroupe, Utilisateur, Ville
 from rest_framework import permissions, mixins
-
 from rest_framework import status
 from rest_framework import parsers
 from rest_framework import response

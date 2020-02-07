@@ -1,14 +1,13 @@
 import django.db.utils
+import tempfile
 
 from django.urls import reverse
 from rest_framework import status
 from django.test import TestCase
 from rest_framework.test import APITestCase
-from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur
 from PIL import Image
-import tempfile
 
 
 class UtilisateurTest(TestCase):
@@ -17,9 +16,6 @@ class UtilisateurTest(TestCase):
         super().setUpClass()
         Utilisateur.objects.create(username='user1', first_name='user1', last_name='user1', email='user1@user1.fr')
         Utilisateur.objects.create(username='user2', first_name='user2', last_name='user2', email='user2@user2.fr')
-
-        # client = APIClient()
-        # client.login(username='admin', password='admin')
 
     def test_champs_utilisateur(self):
         utilisateur = Utilisateur.objects.get(username='user1')
@@ -185,6 +181,27 @@ class UtilisateurTests(BasicAPITests):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(nouvelle_image)
+
+    def test_api_utilisateur_invitations(self):
+        Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
+
+        response = self.client2.get('/utilisateur/2/invitation', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(list(response.data.items())[0][1], 1)
+
+    def test_api_utilisateur_accepte_invitation(self):
+        Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
+
+        response = self.client2.patch('/utilisateur/2/accepte-invitation/1', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Invitation.objects.get(id=1).accepte, True)
+
+    def test_api_utilisateur_refuse_invitation(self):
+        Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
+
+        response = self.client2.patch('/utilisateur/2/refuse-invitation/1', format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Invitation.objects.get(id=1).accepte, False)
 
 
 class GroupeTests(BasicAPITests):

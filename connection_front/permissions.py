@@ -1,9 +1,9 @@
 from rest_framework import permissions
-from .models import Groupe, MembreGroupe
+from .models import MembreGroupe
 
 """
 has_permission method will be called on all (GET, POST, PUT, DELETE) HTTP request.
-has_object_permission method will not be called on HTTP POST request, hence we need to restrict it 
+has_object_permission method will not be called on HTTP POST request, hence we need to restrict it
 from has_permission method.
 """
 
