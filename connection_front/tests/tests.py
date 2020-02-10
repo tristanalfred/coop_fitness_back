@@ -1,5 +1,6 @@
 import django.db.utils
 import tempfile
+import glob, os
 
 from django.urls import reverse
 from rest_framework import status
@@ -45,7 +46,6 @@ class MembreGroupeTest(TestCase):
         with self.assertRaises(django.db.utils.IntegrityError):
             MembreGroupe.objects.create(membre=Utilisateur.objects.get(username='user1'), groupe=Groupe.objects.first())
 
-
 class BasicAPITests(APITestCase):
     @classmethod
     def setUpClass(cls):
@@ -82,6 +82,13 @@ class BasicAPITests(APITestCase):
 
 
 class UtilisateurTests(BasicAPITests):
+    @classmethod
+    def tearDownClass(cls):
+        # Suppression des fichiers temporels créée pendant les tests
+        for filename in glob.glob("media/images/tmp*"):
+            os.remove(filename)
+        super().tearDownClass()
+
     def test_inscription_utilisateur(self):
         """
         Inscription d'un nouvel utilisateur
@@ -170,7 +177,7 @@ class UtilisateurTests(BasicAPITests):
             _ancienne_image = Utilisateur.objects.get(id=2).image_profil.url
 
         image = Image.new('RGB', (100, 100))
-        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg', delete=True)
         image.save(tmp_file)
         tmp_file.seek(0)
 
@@ -178,9 +185,15 @@ class UtilisateurTests(BasicAPITests):
         data = {'image_profil': tmp_file}
         response = self.client2.put(url, data, format='multipart')
         nouvelle_image = Utilisateur.objects.get(id=2).image_profil.url
+        # os.remove(tmp_file.name)
+        os.unlink(tmp_file.name)
+        user = Utilisateur.objects.get(id=2)
+        user.image_profil = None
+        user.save()
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(nouvelle_image)
+
 
     def test_api_utilisateur_invitations(self):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
