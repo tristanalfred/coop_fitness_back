@@ -5,6 +5,16 @@ from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin
 
 
+class MembresGroupeAdmin(admin.TabularInline):
+    model = MembreGroupe
+
+    fieldsets = (
+        (None, {'fields': ('groupe', 'createur', 'responsable')}),
+    )
+
+    readonly_fields = ["createur"]
+
+
 class UtilisateurAdmin(UserAdmin):
     """
     Changements de l'affichage de l'utilisateur pour une meilleur visibilité sur la page d'administration
@@ -17,14 +27,14 @@ class UtilisateurAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Informations personnelles', {'fields': ('first_name', 'last_name', 'email', 'apercu_image', 'image_profil')}),
-        ('Informations sociales', {'fields': ('adresse', 'ville', 'groupes')}),
+        ('Informations sociales', {'fields': ('adresse', 'ville')}),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'user_permissions'),  # Ajouter RoleUtilisateur
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
-    filter_horizontal = ('groupes',)
+    inlines = [MembresGroupeAdmin, ]
 
     readonly_fields = ['apercu_image']
 
@@ -50,7 +60,10 @@ class MembresAdmin(admin.TabularInline):
         (None, {'fields': ('membre', 'createur', 'responsable')}),
     )
 
-    readonly_fields = ["createur"]
+    def get_readonly_fields(self, request, obj=None):
+        if MembreGroupe.objects.filter(groupe__id=obj.id).filter(createur=True).count() != 0:
+            return ['createur']
+        return self.readonly_fields
 
 
 class GroupeAdmin(admin.ModelAdmin):
@@ -103,5 +116,4 @@ admin.site.register(Suivi)
 admin.site.register(Utilisateur, UtilisateurAdmin)
 admin.site.register(Ville)
 admin.site.register(Groupe, GroupeAdmin)
-# admin.site.register(Groupe)
 admin.site.register(MembreGroupe)

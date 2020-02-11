@@ -208,6 +208,7 @@ class UtilisateurTests(BasicAPITests):
         response = self.client2.patch('/utilisateur/2/accepte-invitation/1', format='json', follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Invitation.objects.get(id=1).accepte, True)
+        self.assertEqual(Utilisateur.objects.get(id=2).groupes.filter(groupe_id=1).count(), 1)
 
     def test_api_utilisateur_refuse_invitation(self):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
@@ -306,6 +307,7 @@ class GroupeTests(BasicAPITests):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ancien_etat_demande, None)
         self.assertEqual(DemandeInscription.objects.get(id=1).accepte, True)
+        self.assertEqual(MembreGroupe.objects.filter(membre__id=2).filter(groupe__id=1).count(), 1)
 
     def test_api_groupe_refuse_demande(self):
         url = reverse('demandeinscription-list')

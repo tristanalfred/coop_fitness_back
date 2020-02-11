@@ -3,8 +3,8 @@ from rest_framework import viewsets
 from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
     InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
     UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
-    UtilisateurUploadSerializer, MinimumUtilisateurSerializer
-from connection_front.models import DemandeInscription, Invitation, MembreGroupe, Utilisateur, Ville
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer, GroupeSerializer
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur, Ville
 from rest_framework import permissions, mixins
 from rest_framework import status
 from rest_framework import parsers
@@ -187,7 +187,16 @@ class AccepteDemandeAPIView(APIView):
             demande = DemandeInscription.objects.get(id=kwargs.get('demande_id'))
             demande.accepte = True
             demande.save()
-            return response.Response(status.HTTP_202_ACCEPTED)
+            data = {
+                'membre': DemandeInscription.objects.get(id=kwargs.get('demande_id')).expediteur.id,
+                'groupe': kwargs.get('groupe_id'),
+                'createur': False,
+                'responsable': False
+            }
+            serializer = MembreGroupeSerializer(data=data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return response.Response(status.HTTP_202_ACCEPTED)
         return response.Response(status.HTTP_404_NOT_FOUND)
 
 
@@ -221,7 +230,17 @@ class AccepteInvitationAPIView(APIView):
             demande = Invitation.objects.get(id=kwargs.get('invitation_id'))
             demande.accepte = True
             demande.save()
-            return response.Response(status.HTTP_202_ACCEPTED)
+
+            data = {
+                'membre': kwargs.get('utilisateur_id'),
+                'groupe': Invitation.objects.get(id=kwargs.get('invitation_id')).groupe.id,
+                'createur': False,
+                'responsable': False
+            }
+            serializer = MembreGroupeSerializer(data=data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return response.Response(status.HTTP_202_ACCEPTED)
         return response.Response(status.HTTP_404_NOT_FOUND)
 
 

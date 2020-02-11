@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from connection_front.models import DemandeInscription, Invitation, MembreGroupe, Utilisateur, Ville
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur, Ville
+
+
+class GroupeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Groupe
+        fields = '__all__'
 
 
 class UtilisateurSerializer(serializers.HyperlinkedModelSerializer):

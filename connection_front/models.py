@@ -37,7 +37,7 @@ class Utilisateur(django.contrib.auth.models.User):
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
     image_profil = models.ImageField(blank=True, null=True, upload_to='images/')
-    groupes = models.ManyToManyField('Groupe', blank=True, verbose_name="groupes", related_name='+')
+    # groupes = models.ManyToManyField('Groupe', blank=True, verbose_name="groupes", related_name='+')
     # notif_app = models.BooleanField(default=False)
     # notif_mail = models.BooleanField(default=False)
 
@@ -71,8 +71,8 @@ class Groupe(models.Model):
 
 
 class MembreGroupe(models.Model):
-    membre = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="membre", related_name='+')
-    groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
+    membre = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="membre", related_name='groupes')
+    groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='membres')
     createur = models.BooleanField(default=False)
     responsable = models.BooleanField(default=False)
 
