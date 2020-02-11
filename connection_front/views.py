@@ -295,3 +295,25 @@ class RetireResponsableAPIView(APIView):
             membregroupe.save()
             return response.Response(status.HTTP_202_ACCEPTED)
         return response.Response(status.HTTP_404_NOT_FOUND)
+
+
+class CreationGroupeAPIView(APIView):
+    """
+    Vue permettant à un utilisateur de créer un groupe
+    """
+    serializer_class = GroupeSerializer
+    queryset = Groupe.objects.all()
+    permission_classes = [perm.IsAdminOrAuthentifiedPostOnly]
+
+    def post(self, request):
+        serializer = GroupeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            # Ajout de l'utilisateur en tant que créateur
+            MembreGroupe.objects.create(membre=Utilisateur.objects.get(id=request.user.id),
+                                        groupe=Groupe.objects.get(id=serializer.data['id']),
+                                        createur=True, responsable=True)
+
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

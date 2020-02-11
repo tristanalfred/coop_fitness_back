@@ -46,6 +46,7 @@ class MembreGroupeTest(TestCase):
         with self.assertRaises(django.db.utils.IntegrityError):
             MembreGroupe.objects.create(membre=Utilisateur.objects.get(username='user1'), groupe=Groupe.objects.first())
 
+
 class BasicAPITests(APITestCase):
     @classmethod
     def setUpClass(cls):

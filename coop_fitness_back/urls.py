@@ -46,6 +46,7 @@ urlpatterns = [
              views.RefuseInvitationAPIView.as_view()),
     urls.url('^groupe/(?P<groupe_id>.+)/rend-responsable/(?P<membre_id>.+)$', views.RendResponsableAPIView.as_view()),
     urls.url('^groupe/(?P<groupe_id>.+)/retire-responsable/(?P<membre_id>.+)$', views.RetireResponsableAPIView.as_view()),
+    urls.url('^creation-groupe$', views.CreationGroupeAPIView.as_view()),
 ]
 
 if settings.DEBUG:
