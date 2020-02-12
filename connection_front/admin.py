@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, MembreGroupe, MessageGroupe, MessagePrive, \
-    Permission, Suivi, Utilisateur, Ville
+from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, MembreGroupe, MessageGroupe, \
+    MessagePrive, Permission, Suivi, Utilisateur, Ville
 from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin
+from django.template.defaultfilters import truncatechars
 
 
 class MembresGroupeAdmin(admin.TabularInline):
@@ -106,11 +107,19 @@ class InvitationAdmin(admin.ModelAdmin):
     ordering = ('id',)
 
 
+class MessagePriveAdmin(admin.ModelAdmin):
+    """
+    Changements de l'affichage d'une invitation
+    """
+    list_display = ('expediteur', 'destinataire', 'short_description', 'date_envoi')
+    ordering = ('id',)
+
+
 admin.site.register(DemandeInscription, DemandeInscriptionAdmin)
 admin.site.register(RoleUtilisateur)
 admin.site.register(Invitation, InvitationAdmin)
 admin.site.register(MessageGroupe)
-admin.site.register(MessagePrive)
+admin.site.register(MessagePrive, MessagePriveAdmin)
 admin.site.register(Permission)
 admin.site.register(Suivi)
 admin.site.register(Utilisateur, UtilisateurAdmin)

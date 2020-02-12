@@ -30,6 +30,8 @@ router.register(r'compte', views.UtilisateurCompteViewSet, base_name='compte')
 router.register(r'upload', views.UploadProfileViewSet)
 router.register(r'invitation', views.InvitationViewSet)
 router.register(r'demande-inscription', views.DemandeInscriptionViewSet)
+router.register('message-prive', views.MessagePriveViewSet, base_name='msg-prive')  # POST
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,6 +49,7 @@ urlpatterns = [
     urls.url('^groupe/(?P<groupe_id>.+)/rend-responsable/(?P<membre_id>.+)$', views.RendResponsableAPIView.as_view()),
     urls.url('^groupe/(?P<groupe_id>.+)/retire-responsable/(?P<membre_id>.+)$', views.RetireResponsableAPIView.as_view()),
     urls.url('^creation-groupe$', views.CreationGroupeAPIView.as_view()),
+    urls.url('^message-prive/(?P<destinataire_id>.+)$', views.MessagePriveViewSet.as_view({'get': 'list'}), name='msg'),  # GET /!\ pas toucher
 ]
 
 if settings.DEBUG:

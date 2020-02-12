@@ -7,7 +7,7 @@ from rest_framework import status
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
-from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessagePrive, Utilisateur
 from PIL import Image
 
 
@@ -195,7 +195,6 @@ class UtilisateurTests(BasicAPITests):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(nouvelle_image)
 
-
     def test_api_utilisateur_invitations(self):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
 
@@ -339,3 +338,28 @@ class GroupeTests(BasicAPITests):
         response = self.client1.patch('/groupe/1/retire-responsable/2', format='json', follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(MembreGroupe.objects.filter(groupe__id=1).get(membre__id=2).responsable, False)
+
+
+class MessageTests(BasicAPITests):
+    def test_envoi_message(self):
+        url = reverse('msg-prive-list')
+        data = {
+            'destinataire': '2',
+            'texte': 'FETCH !'
+        }
+        response = self.client1.post(url, data=data, format='json', follow=True)
+        message_cree = MessagePrive.objects.first()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(message_cree.expediteur.id, 1)
+        self.assertEqual(message_cree.destinataire.id, 2)
+        self.assertEqual(message_cree.texte, 'FETCH !')
+
+    def test_lecture_message(self):
+        url = reverse('msg', kwargs={'destinataire_id': '2'})
+        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1], texte='test')
+        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1], texte='test')
+
+        response = self.client1.get(url, format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)

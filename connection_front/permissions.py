@@ -128,3 +128,22 @@ class IsAdminOrAuthentifiedPostOnly(permissions.BasePermission):
         if (request.method == 'POST') and (request.user.is_authenticated or request.user.is_staff):
             return True
         return False
+
+
+class MessagePrivePermission(permissions.BasePermission):
+    """
+    Permission autorisant l'envoie d'un message d'un utilisateur à un autre,
+    ou d'accéder aux messages dont il est l'expéditeur ou le destinataire.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'POST' and request.user.is_authenticated:
+            return True
+        elif request.method == 'GET' and obj.count() == 0 and request.user.is_authenticated:
+            return True
+        elif request.method == 'GET' \
+                and (obj.first().expediteur.id == request.user.id
+                     or view.kwargs.get('destinataire_id') == request.user.id) \
+                and request.user.is_authenticated:
+            return True
+        return False

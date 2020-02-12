@@ -3,6 +3,7 @@ import django.contrib.auth.models
 
 from django.utils import timezone
 from django.db import models
+from django.template.defaultfilters import truncatechars
 
 
 class Utilisateur(django.contrib.auth.models.User):
@@ -71,7 +72,7 @@ class MessageGroupe(models.Model):
     expediteur = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="expéditeur", related_name='+')
     groupe = models.ForeignKey('Groupe', on_delete=models.CASCADE, verbose_name="groupe", related_name='+')
     texte = models.CharField(max_length=300)
-    date_envoi = models.DateField()
+    date_envoi = models.DateTimeField(default=django.utils.timezone.now)
 
     class Meta:
         verbose_name = "message de groupe"
@@ -86,11 +87,16 @@ class MessagePrive(models.Model):
     destinataire = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="destinataire",
                                      related_name='+')
     texte = models.CharField(max_length=300)
-    date_envoi = models.DateField()
+    date_envoi = models.DateTimeField(default=django.utils.timezone.now)
+
+    @property
+    def short_description(self):
+        return truncatechars(self.texte, 35)
 
     class Meta:
         verbose_name = "message privé"
         verbose_name_plural = "messages privé"
+        ordering = ['-id']
 
 
 class Invitation(models.Model):
@@ -132,4 +138,4 @@ class Suivi(models.Model):
     Permet de suivre un autre utilisateur
     """
     interesse = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="interesse", related_name='+')
-    concerne = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="concernte", related_name='+')
+    concerne = models.ForeignKey('Utilisateur', on_delete=models.CASCADE, verbose_name="concerne", related_name='+')

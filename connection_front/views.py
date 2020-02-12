@@ -3,8 +3,9 @@ from rest_framework import viewsets
 from connection_front.serializers import DemandeInscriptionSerializer, DemandeInscriptionUtilisateurSerializer, \
     InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
     UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
-    UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer, GroupeSerializer
-from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, Utilisateur, Ville
+    UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer, GroupeSerializer, \
+    MessagePriveSerializer
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessagePrive, Utilisateur, Ville
 from rest_framework import permissions, mixins
 from rest_framework import status
 from rest_framework import parsers
@@ -36,7 +37,7 @@ class PutOnlyModelViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     pass
 
 
-class CreateReadOnlyViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class CreateReadOnlyViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     ViewSet ne permettant que de visualiser et créer une instance du modèle
     """
@@ -317,3 +318,34 @@ class CreationGroupeAPIView(APIView):
 
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessagePriveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    Vue permettant d'envoyer et de recevoir des messages
+    """
+    queryset = MessagePrive.objects.all()
+    serializer_class = MessagePriveSerializer
+    permission_classes = [perm.MessagePrivePermission]
+
+    def create(self, request, *args, **kwargs):
+        data = {
+            'expediteur': Utilisateur.objects.get(id=request.user.id),
+            'destinataire': Utilisateur.objects.get(id=list(request.data.items())[0][1]),
+            'texte': list(request.data.items())[1][1]
+        }
+
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(status.HTTP_200_OK)
+        return response.Response(serializer.errors,
+                                 status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        queryset = MessagePrive.objects.filter(expediteur=Utilisateur.objects.get(id=request.user.id)).filter(
+                destinataire=kwargs.get('destinataire_id')).order_by('date_envoi')
+
+        self.check_object_permissions(self.request, queryset)
+        serializer = MessagePriveSerializer(queryset, context={'request': request}, many=True)
+        return response.Response(serializer.data)
