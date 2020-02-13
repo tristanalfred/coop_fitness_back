@@ -147,3 +147,25 @@ class MessagePrivePermission(permissions.BasePermission):
                 and request.user.is_authenticated:
             return True
         return False
+
+
+class MessageGroupePermission(permissions.BasePermission):
+    """
+    Permission autorisant l'envoie d'un message d'un utilisateur à un groupe auquel il appartient,
+    ou d'accéder aux messages du groupe.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'POST' \
+                and request.user.is_authenticated \
+                and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id'))\
+                .filter(membre__id=request.user.id).count() == 1:
+            return True
+
+        elif request.method == 'GET' \
+                and request.user.is_authenticated \
+                and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id'))\
+                .filter(membre__id=request.user.id).count() == 1:
+            return True
+
+        return False

@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessagePrive, Utilisateur, \
-    Ville
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessageGroupe, MessagePrive, \
+    Utilisateur, Ville
 
 
-class GroupeSerializer(serializers.ModelSerializer):
+class GroupeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Groupe
         fields = '__all__'
@@ -97,3 +97,10 @@ class MessagePriveSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessagePrive
         fields = '__all__'
+
+
+class MessageGroupeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MessageGroupe
+        # fields = '__all__'
+        fields = ['id', 'expediteur', 'groupe', 'texte']

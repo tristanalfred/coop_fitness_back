@@ -4,8 +4,9 @@ from connection_front.serializers import DemandeInscriptionSerializer, DemandeIn
     InvitationSerializer, InvitationGroupeSerializer, UtilisateurSerializer, VilleSerializer, \
     UtilisateurChangeSerializer, UtilisateurInscriptionSerializer, UtilisateurUploadProfileSerializer, \
     UtilisateurUploadSerializer, MinimumUtilisateurSerializer, MembreGroupeSerializer, GroupeSerializer, \
-    MessagePriveSerializer
-from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessagePrive, Utilisateur, Ville
+    MessagePriveSerializer, MessageGroupeSerializer
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessageGroupe,  \
+    MessagePrive, Utilisateur, Ville
 from rest_framework import permissions, mixins
 from rest_framework import status
 from rest_framework import parsers
@@ -322,7 +323,7 @@ class CreationGroupeAPIView(APIView):
 
 class MessagePriveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-    Vue permettant d'envoyer et de recevoir des messages
+    Vue permettant d'envoyer et de recevoir des messages entre utilisateurs
     """
     queryset = MessagePrive.objects.all()
     serializer_class = MessagePriveSerializer
@@ -348,4 +349,38 @@ class MessagePriveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewse
 
         self.check_object_permissions(self.request, queryset)
         serializer = MessagePriveSerializer(queryset, context={'request': request}, many=True)
+        return response.Response(serializer.data)
+
+
+class MessageGroupeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    Vue permettant d'envoyer et de recevoir des messages de groupes
+    """
+    queryset = MessageGroupe.objects.all()
+    serializer_class = MessageGroupeSerializer
+    permission_classes = [perm.MessageGroupePermission]
+
+    def create(self, request, *args, **kwargs):
+        print('create')
+        # TODO : trouver pq le serializer à l'air d'enregistrer l'objet utilisateur MAIS l'id du groupe
+        data = {
+            'expediteur': Utilisateur.objects.get(id=request.user.id),
+            'groupe': Groupe.objects.get(id=list(request.data.items())[0][1]).id,
+            'texte': list(request.data.items())[1][1]
+        }
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            print('on revnerra 200')
+            return response.Response(status.HTTP_200_OK)
+        print('on reverra 400')
+        return response.Response(serializer.errors,
+                                 status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        queryset = MessageGroupe.objects.filter(expediteur=Utilisateur.objects.get(id=request.user.id)).filter(
+                groupe=kwargs.get('groupe_id')).order_by('date_envoi')
+
+        self.check_object_permissions(self.request, queryset)
+        serializer = MessageGroupeSerializer(queryset, context={'request': request}, many=True)
         return response.Response(serializer.data)

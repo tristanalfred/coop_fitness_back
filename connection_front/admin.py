@@ -109,16 +109,24 @@ class InvitationAdmin(admin.ModelAdmin):
 
 class MessagePriveAdmin(admin.ModelAdmin):
     """
-    Changements de l'affichage d'une invitation
+    Changements de l'affichage d'un message privé
     """
     list_display = ('expediteur', 'destinataire', 'short_description', 'date_envoi')
+    ordering = ('id',)
+
+
+class MessageGroupeAdmin(admin.ModelAdmin):
+    """
+    Changements de l'affichage d'un message de groupe
+    """
+    list_display = ('expediteur', 'groupe', 'short_description', 'date_envoi')
     ordering = ('id',)
 
 
 admin.site.register(DemandeInscription, DemandeInscriptionAdmin)
 admin.site.register(RoleUtilisateur)
 admin.site.register(Invitation, InvitationAdmin)
-admin.site.register(MessageGroupe)
+admin.site.register(MessageGroupe, MessageGroupeAdmin)
 admin.site.register(MessagePrive, MessagePriveAdmin)
 admin.site.register(Permission)
 admin.site.register(Suivi)

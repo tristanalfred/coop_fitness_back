@@ -7,7 +7,8 @@ from rest_framework import status
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
-from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessagePrive, Utilisateur
+from connection_front.models import DemandeInscription, Groupe, Invitation, MembreGroupe, MessageGroupe, MessagePrive, \
+    Utilisateur
 from PIL import Image
 
 
@@ -341,7 +342,7 @@ class GroupeTests(BasicAPITests):
 
 
 class MessageTests(BasicAPITests):
-    def test_envoi_message(self):
+    def test_envoi_message_prive(self):
         url = reverse('msg-prive-list')
         data = {
             'destinataire': '2',
@@ -355,10 +356,37 @@ class MessageTests(BasicAPITests):
         self.assertEqual(message_cree.destinataire.id, 2)
         self.assertEqual(message_cree.texte, 'FETCH !')
 
-    def test_lecture_message(self):
+    def test_lecture_message_prive(self):
         url = reverse('msg', kwargs={'destinataire_id': '2'})
-        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1], texte='test')
-        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1], texte='test')
+        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1],
+                                    texte='test')
+        MessagePrive.objects.create(expediteur=Utilisateur.objects.first(), destinataire=Utilisateur.objects.all()[1],
+                                    texte='test')
+
+        response = self.client1.get(url, format='json', follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_envoi_message_groupe(self):
+        url = reverse('msg-groupe-list')
+        data = {
+            'groupe': '1',
+            'texte': 'FETCH VOUS !'
+        }
+        response = self.client1.post(url, data=data, format='json', follow=True)
+        message_cree = MessageGroupe.objects.first()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(message_cree.expediteur.id, 1)
+        self.assertEqual(message_cree.groupe.id, 1)
+        self.assertEqual(message_cree.texte, 'FETCH VOUS !')
+
+    def test_lecture_message_groupe(self):
+        url = reverse('msg-g', kwargs={'groupe_id': '1'})
+        MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
+                                     groupe=Groupe.objects.first(), texte='test')
+        MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
+                                     groupe=Groupe.objects.first(), texte='test')
 
         response = self.client1.get(url, format='json', follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

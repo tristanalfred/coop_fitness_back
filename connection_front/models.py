@@ -74,9 +74,14 @@ class MessageGroupe(models.Model):
     texte = models.CharField(max_length=300)
     date_envoi = models.DateTimeField(default=django.utils.timezone.now)
 
+    @property
+    def short_description(self):
+        return truncatechars(self.texte, 35)
+
     class Meta:
         verbose_name = "message de groupe"
         verbose_name_plural = "messages de groupe"
+        ordering = ['-id']
 
 
 class MessagePrive(models.Model):
