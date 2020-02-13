@@ -104,6 +104,7 @@ class UtilisateurTests(BasicAPITests):
             'password': 'password'
         }
         response = self.client.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Utilisateur.objects.filter(username='testuser').count(), 1)
 
@@ -113,6 +114,7 @@ class UtilisateurTests(BasicAPITests):
         """
         url = reverse('utilisateurs-list')
         response = self.client_admin.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_get_utilisateur(self):
@@ -121,6 +123,7 @@ class UtilisateurTests(BasicAPITests):
         """
         url = reverse('utilisateurs-detail', kwargs={'pk': '1'})
         response = self.client_admin.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_get_utilisateur_ko(self):
@@ -129,6 +132,7 @@ class UtilisateurTests(BasicAPITests):
         """
         url = reverse('utilisateurs-detail', kwargs={'pk': '100'})
         response = self.client_admin.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_change_utilisateur(self):
@@ -187,7 +191,6 @@ class UtilisateurTests(BasicAPITests):
         data = {'image_profil': tmp_file}
         response = self.client2.put(url, data, format='multipart')
         nouvelle_image = Utilisateur.objects.get(id=2).image_profil.url
-        # os.remove(tmp_file.name)
         os.unlink(tmp_file.name)
         user = Utilisateur.objects.get(id=2)
         user.image_profil = None
@@ -200,6 +203,7 @@ class UtilisateurTests(BasicAPITests):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
 
         response = self.client2.get('/utilisateur/2/invitation', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(list(response.data.items())[0][1], 1)
 
@@ -207,6 +211,7 @@ class UtilisateurTests(BasicAPITests):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
 
         response = self.client2.patch('/utilisateur/2/accepte-invitation/1', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Invitation.objects.get(id=1).accepte, True)
         self.assertEqual(Utilisateur.objects.get(id=2).groupes.filter(groupe_id=1).count(), 1)
@@ -215,6 +220,7 @@ class UtilisateurTests(BasicAPITests):
         Invitation.objects.create(groupe=Groupe.objects.first(), destinataire=Utilisateur.objects.get(id=2))
 
         response = self.client2.patch('/utilisateur/2/refuse-invitation/1', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Invitation.objects.get(id=1).accepte, False)
 
@@ -227,6 +233,7 @@ class GroupeTests(BasicAPITests):
             'destinataire': '2'
         }
         response = self.client1.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 1)
 
@@ -238,6 +245,7 @@ class GroupeTests(BasicAPITests):
         }
         self.client1.post(url, data, format='json')
         response = self.client1.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 1)
 
@@ -248,6 +256,7 @@ class GroupeTests(BasicAPITests):
             'destinataire': '2'
         }
         response = self.client2.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Invitation.objects.filter(groupe__id=1).count(), 0)
 
@@ -258,6 +267,7 @@ class GroupeTests(BasicAPITests):
             'groupe': '1'
         }
         response = self.client2.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 1)
 
@@ -269,6 +279,7 @@ class GroupeTests(BasicAPITests):
         }
         self.client2.post(url, data, format='json')
         response = self.client2.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 1)
 
@@ -279,6 +290,7 @@ class GroupeTests(BasicAPITests):
             'groupe': '1'
         }
         response = self.client1.post(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(DemandeInscription.objects.filter(groupe__id=1).count(), 0)
 
@@ -301,10 +313,9 @@ class GroupeTests(BasicAPITests):
             'groupe': '1'
         }
         self.client2.post(url, data, format='json')
-
         ancien_etat_demande = DemandeInscription.objects.get(id=1).accepte
-
         response = self.client1.patch('/groupe/1/accepte-demande/1', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ancien_etat_demande, None)
         self.assertEqual(DemandeInscription.objects.get(id=1).accepte, True)
@@ -317,26 +328,25 @@ class GroupeTests(BasicAPITests):
             'groupe': '1'
         }
         self.client2.post(url, data, format='json')
-
         ancien_etat_demande = DemandeInscription.objects.get(id=1).accepte
-
         response = self.client1.patch('/groupe/1/refuse-demande/1', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ancien_etat_demande, None)
         self.assertEqual(DemandeInscription.objects.get(id=1).accepte, False)
 
     def test_api_groupe_rend_responsable(self):
         MembreGroupe.objects.create(membre=Utilisateur.objects.get(id=2), groupe=Groupe.objects.first())
-
         response = self.client1.patch('/groupe/1/rend-responsable/2', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(MembreGroupe.objects.filter(groupe__id=1).get(membre__id=2).responsable, True)
 
     def test_api_groupe_retire_responsable(self):
         MembreGroupe.objects.create(membre=Utilisateur.objects.get(id=2), groupe=Groupe.objects.first(),
                                     responsable=True)
-
         response = self.client1.patch('/groupe/1/retire-responsable/2', format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(MembreGroupe.objects.filter(groupe__id=1).get(membre__id=2).responsable, False)
 
@@ -364,6 +374,7 @@ class MessageTests(BasicAPITests):
                                     texte='test')
 
         response = self.client1.get(url, format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
@@ -381,13 +392,34 @@ class MessageTests(BasicAPITests):
         self.assertEqual(message_cree.groupe.id, 1)
         self.assertEqual(message_cree.texte, 'FETCH VOUS !')
 
+    def test_envoi_message_groupe_non_membre_ko(self):
+        url = reverse('msg-groupe-list')
+        data = {
+            'groupe': '1',
+            'texte': 'FETCH VOUS !'
+        }
+        response = self.client2.post(url, data=data, format='json', follow=True)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(MessageGroupe.objects.count(), 0)
+
     def test_lecture_message_groupe(self):
         url = reverse('msg-g', kwargs={'groupe_id': '1'})
         MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
                                      groupe=Groupe.objects.first(), texte='test')
         MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
                                      groupe=Groupe.objects.first(), texte='test')
-
         response = self.client1.get(url, format='json', follow=True)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
+
+    def test_lecture_message_groupe_non_membre_ko(self):
+        url = reverse('msg-g', kwargs={'groupe_id': '1'})
+        MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
+                                     groupe=Groupe.objects.first(), texte='test')
+        MessageGroupe.objects.create(expediteur=Utilisateur.objects.first(),
+                                     groupe=Groupe.objects.first(), texte='test')
+        response = self.client2.get(url, format='json', follow=True)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

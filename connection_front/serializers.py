@@ -102,5 +102,4 @@ class MessagePriveSerializer(serializers.ModelSerializer):
 class MessageGroupeSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessageGroupe
-        # fields = '__all__'
-        fields = ['id', 'expediteur', 'groupe', 'texte']
+        fields = '__all__'

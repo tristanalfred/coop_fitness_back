@@ -361,7 +361,6 @@ class MessageGroupeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, views
     permission_classes = [perm.MessageGroupePermission]
 
     def create(self, request, *args, **kwargs):
-        print('create')
         # TODO : trouver pq le serializer à l'air d'enregistrer l'objet utilisateur MAIS l'id du groupe
         data = {
             'expediteur': Utilisateur.objects.get(id=request.user.id),
@@ -371,9 +370,7 @@ class MessageGroupeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, views
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
-            print('on revnerra 200')
             return response.Response(status.HTTP_200_OK)
-        print('on reverra 400')
         return response.Response(serializer.errors,
                                  status.HTTP_400_BAD_REQUEST)
 

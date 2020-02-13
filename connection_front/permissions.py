@@ -136,10 +136,15 @@ class MessagePrivePermission(permissions.BasePermission):
     ou d'accéder aux messages dont il est l'expéditeur ou le destinataire.
     """
 
-    def has_object_permission(self, request, view, obj):
-        if request.method == 'POST' and request.user.is_authenticated:
+    def has_permission(self, request, view):
+        if request.method == 'GET':
             return True
-        elif request.method == 'GET' and obj.count() == 0 and request.user.is_authenticated:
+        elif request.method == 'POST' and request.user.is_authenticated:
+            return True
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'GET' and obj.count() == 0 and request.user.is_authenticated:
             return True
         elif request.method == 'GET' \
                 and (obj.first().expediteur.id == request.user.id
@@ -154,15 +159,18 @@ class MessageGroupePermission(permissions.BasePermission):
     Permission autorisant l'envoie d'un message d'un utilisateur à un groupe auquel il appartient,
     ou d'accéder aux messages du groupe.
     """
-
-    def has_object_permission(self, request, view, obj):
-        if request.method == 'POST' \
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        elif request.method == 'POST' \
                 and request.user.is_authenticated \
-                and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id'))\
+                and MembreGroupe.objects.filter(groupe__id=request.data.get('groupe')) \
                 .filter(membre__id=request.user.id).count() == 1:
             return True
+        return False
 
-        elif request.method == 'GET' \
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'GET' \
                 and request.user.is_authenticated \
                 and MembreGroupe.objects.filter(groupe__id=view.kwargs.get('groupe_id'))\
                 .filter(membre__id=request.user.id).count() == 1:
