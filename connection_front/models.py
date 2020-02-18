@@ -11,6 +11,7 @@ class Utilisateur(django.contrib.auth.models.User):
     ville = models.ForeignKey('Ville', on_delete=models.CASCADE, verbose_name="ville", related_name='user_set',
                               blank=True, null=True)
     image_profil = models.ImageField(blank=True, null=True, upload_to='images/')
+    is_coach = models.BooleanField(default=False)
     # notif_app = models.BooleanField(default=False)
     # notif_mail = models.BooleanField(default=False)
 

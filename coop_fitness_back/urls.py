@@ -17,21 +17,30 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from connection_front import views
+from sante import views as views_s
 from django.conf import settings, urls
 from django.conf.urls.static import static
 
 
 router = routers.DefaultRouter(trailing_slash=False)
-router.register(r'users', views.UserViewSet, base_name='utilisateurs')
+
+# URLs générales
+router.register(r'users', views.UserViewSet, basename='utilisateur')
 router.register(r'villes', views.VilleViewSet)
-router.register(r'change', views.UtilisateurChangeViewSet, base_name='change')
-router.register(r'inscription', views.UtilisateurInscriptionViewSet, base_name='inscription')
-router.register(r'compte', views.UtilisateurCompteViewSet, base_name='compte')
+router.register(r'change', views.UtilisateurChangeViewSet, basename='change')
+router.register(r'inscription', views.UtilisateurInscriptionViewSet, basename='inscription')
+router.register(r'compte', views.UtilisateurCompteViewSet, basename='compte')
 router.register(r'upload', views.UploadProfileViewSet)
 router.register(r'invitation', views.InvitationViewSet)
 router.register(r'demande-inscription', views.DemandeInscriptionViewSet)
-router.register('message-prive', views.MessagePriveViewSet, base_name='msg-prive')
-router.register('message-groupe', views.MessageGroupeViewSet, base_name='msg-groupe')  # POST
+router.register('message-prive', views.MessagePriveViewSet, basename='msg-prive')
+router.register('message-groupe', views.MessageGroupeViewSet, basename='msg-groupe')  # POST
+
+# URL santé
+router.register(r'programmes-generaux', views_s.ProgrammeViewSet, basename='programme-general')
+router.register(r'exercices', views_s.ExerciceViewSet, basename='exercice')
+router.register(r'series', views_s.SerieViewSet, basename='serie')
+router.register(r'seances', views_s.SeanceViewSet, basename='seance')
 
 
 urlpatterns = [
