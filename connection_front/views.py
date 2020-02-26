@@ -43,6 +43,12 @@ class CreateReadOnlyViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, 
     pass
 
 
+class DeleteOnlyViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """
+    ViewSet ne permettant que de supprimer une instance du modèle
+    """
+    pass
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     ViewSet permettant de visualiser les utilisateurs et de les modifier
