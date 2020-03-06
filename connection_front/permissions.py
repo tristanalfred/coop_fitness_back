@@ -147,8 +147,8 @@ class MessagePrivePermission(permissions.BasePermission):
         if request.method == 'GET' and obj.count() == 0 and request.user.is_authenticated:
             return True
         elif request.method == 'GET' \
-                and (obj.first().expediteur.id == request.user.id
-                     or view.kwargs.get('destinataire_id') == request.user.id) \
+                and (obj.first().expediteur.id == request.user.id or
+                     view.kwargs.get('destinataire_id') == request.user.id) \
                 and request.user.is_authenticated:
             return True
         return False

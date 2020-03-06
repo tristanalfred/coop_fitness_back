@@ -25,7 +25,7 @@ from django.conf.urls.static import static
 router = routers.DefaultRouter(trailing_slash=False)
 
 # URLs générales
-router.register(r'users', views.UserViewSet, basename='utilisateur')
+router.register(r'users', views.UserViewSet, basename='utilisateurs')
 router.register(r'villes', views.VilleViewSet)
 router.register(r'change', views.UtilisateurChangeViewSet, basename='change')
 router.register(r'inscription', views.UtilisateurInscriptionViewSet, basename='inscription')
@@ -36,11 +36,15 @@ router.register(r'demande-inscription', views.DemandeInscriptionViewSet)
 router.register('message-prive', views.MessagePriveViewSet, basename='msg-prive')
 router.register('message-groupe', views.MessageGroupeViewSet, basename='msg-groupe')  # POST
 
-# URL santé
+# URLs santé
 router.register(r'programmes-generaux', views_s.ProgrammeViewSet, basename='programme-general')
+router.register(r'programmes-generaux-seances', views_s.SeanceProgrameViewSet, basename='programme-general-seance')
 router.register(r'exercices', views_s.ExerciceViewSet, basename='exercice')
 router.register(r'series', views_s.SerieViewSet, basename='serie')
 router.register(r'seances', views_s.SeanceViewSet, basename='seance')
+router.register(r'seances-fav', views_s.SeanceFavViewSet, basename='seance-fav')
+router.register(r'seances-plus', views_s.SeancePlusViewSet, basename='seance-plus')  # TODO : unifier seance et plus
+router.register(r'series-plus', views_s.SeriePlusViewSet, basename='serie-plus')
 
 
 urlpatterns = [
@@ -61,6 +65,8 @@ urlpatterns = [
     urls.url('^creation-groupe$', views.CreationGroupeAPIView.as_view()),
     urls.url('^message-prive/(?P<destinataire_id>.+)$', views.MessagePriveViewSet.as_view({'get': 'list'}), name='msg'),
     urls.url('^message-groupe/(?P<groupe_id>.+)$', views.MessageGroupeViewSet.as_view({'get': 'list'}), name='msg-g'),
+
+    # URLs santé
 ]
 
 if settings.DEBUG:

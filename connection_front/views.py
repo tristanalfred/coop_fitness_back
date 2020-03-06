@@ -344,8 +344,10 @@ class MessagePriveViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewse
                                  status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
-        queryset = MessagePrive.objects.filter(expediteur=Utilisateur.objects.get(id=request.user.id)).filter(
-                destinataire=kwargs.get('destinataire_id')).order_by('date_envoi')
+        queryset = MessagePrive.objects\
+            .filter(expediteur=Utilisateur.objects.get(id=request.user.id))\
+            .filter(destinataire=kwargs.get('destinataire_id'))\
+            .order_by('date_envoi')
 
         self.check_object_permissions(self.request, queryset)
         serializer = MessagePriveSerializer(queryset, context={'request': request}, many=True)
@@ -375,8 +377,10 @@ class MessageGroupeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, views
                                  status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
-        queryset = MessageGroupe.objects.filter(expediteur=Utilisateur.objects.get(id=request.user.id)).filter(
-                groupe=kwargs.get('groupe_id')).order_by('date_envoi')
+        queryset = MessageGroupe.objects\
+            .filter(expediteur=Utilisateur.objects.get(id=request.user.id))\
+            .filter(groupe=kwargs.get('groupe_id'))\
+            .order_by('date_envoi')
 
         self.check_object_permissions(self.request, queryset)
         serializer = MessageGroupeSerializer(queryset, context={'request': request}, many=True)

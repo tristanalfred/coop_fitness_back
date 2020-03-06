@@ -1,9 +1,8 @@
-import datetime
 import django.contrib.auth.models
 
-from django.utils import timezone
 from django.db import models
 from django.template.defaultfilters import truncatechars
+from django.utils import timezone
 
 
 class Utilisateur(django.contrib.auth.models.User):

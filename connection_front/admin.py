@@ -3,7 +3,6 @@ from .models import DemandeInscription, Groupe, RoleUtilisateur, Invitation, Mem
     MessagePrive, Permission, Suivi, Utilisateur, Ville
 from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin
-from django.template.defaultfilters import truncatechars
 
 
 class MembresGroupeAdmin(admin.TabularInline):

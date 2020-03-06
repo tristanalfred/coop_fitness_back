@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from connection_front.models import Utilisateur
 
 """
 has_permission method will be called on all (GET, POST, PUT, DELETE) HTTP request.
@@ -13,11 +14,14 @@ class ProgrammeGeneralPermission(permissions.BasePermission):
     et la visualisation aux utilisateurs connectés.
     """
     def has_permission(self, request, view):
-        # Administrateur ou coach
         if request.method == 'GET' and request.user.is_authenticated:
             return True
         elif request.method in ('POST', 'PUT', 'DELETE') \
                 and request.user.is_authenticated \
-                and (request.user.is_staff or request.user.is_coach):
+                and request.user.is_staff:
             return True
+        elif request.method in ('POST', 'PUT', 'DELETE') and request.user.is_authenticated:
+            utilisateur = Utilisateur.objects.get(username=request.user.username)
+            if utilisateur.is_coach:
+                return True
         return False

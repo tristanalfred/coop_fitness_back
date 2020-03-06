@@ -1,6 +1,7 @@
 import django.db.utils
 import tempfile
-import glob, os
+import glob
+import os
 
 from django.urls import reverse
 from rest_framework import status

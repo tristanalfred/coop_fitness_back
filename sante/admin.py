@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Exercice, Programme, ProgrammeSportIndividuel, Serie, Seance
-from django.contrib.auth.admin import UserAdmin
+from .models import Exercice, Programme, ProgrammeSportIndividuel, Serie, Seance, SeanceFav
 
 
 class ExerciceAdmin(admin.ModelAdmin):
@@ -14,7 +13,7 @@ class SeanceAdmin(admin.ModelAdmin):
     """
     Changement de l'affichage d'une séance sur la page d'administration
     """
-    list_display = ('id',)
+    list_display = ('id', '__str__')
     filter_horizontal = ('serie',)
 
 
@@ -31,11 +30,13 @@ class ProgrammeSportIndividuelAdmin(admin.ModelAdmin):
     Changement de l'affichage du programme d'un utilisateur sur la page d'administration
     """
     list_display = ('utilisateur',)
+    filter_horizontal = ('seance',)
 
 
 # Register your models here.
 admin.site.register(Exercice, ExerciceAdmin)
 admin.site.register(Serie)
 admin.site.register(Seance, SeanceAdmin)
+admin.site.register(SeanceFav)
 admin.site.register(Programme, ProgrammeAdmin)
 admin.site.register(ProgrammeSportIndividuel, ProgrammeSportIndividuelAdmin)
