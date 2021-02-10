@@ -35,18 +35,3 @@ class QuestionMethodTests(TestCase):
         time = timezone.now() - datetime.timedelta(hours=1)
         recent_question = Question(pub_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
-
-    def test_create_question(question_text, days):
-        """
-        Creates a question with the given `question_text` and published the
-        given number of `days` offset to now (negative for questions published
-        in the past, positive for questions that have yet to be published).
-        """
-        time = timezone.now() + datetime.timedelta(days=days)
-        return Question.objects.create(question_text=question_text, pub_date=time)
-
-    def test_echec_test_volontaire(self):
-        """
-        Zut
-        """
-        self.assertEqual(0, 1)
