@@ -45,3 +45,9 @@ def create_question(question_text, days):
     """
     time = timezone.now() + datetime.timedelta(days=days)
     return Question.objects.create(question_text=question_text, pub_date=time)
+
+def echec_test_volontaire(self):
+    """
+    Zut
+    """
+    self.assertEqual(0, 1)
